@@ -1,12 +1,11 @@
 {
   "name": "m-forge",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "cli and function for forge moblets ",
   "main": "mforge.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "patch-release": "npm version patch && npm publish && git push --follow-tags"
-    
   },
   "bin": {
     "m-forge": "mforge.js"
