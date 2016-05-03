@@ -4,7 +4,12 @@
   "description": "cli and function for forge moblets ",
   "main": "mforge.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "patch-release": "npm version patch && npm publish && git push --follow-tags"
+    
+  },
+  "bin": {
+    "m-forge": "mforge.js"
   },
   "author": "Leonardo \"@leualemax\" Ferreira",
   "license": "ISC",
