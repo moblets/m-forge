@@ -1,7 +1,7 @@
 # mForge
 mforge is a package and cli for broserify, minify and revision moblets packs
 ### Version
-1.0.0
+1.0.2
 
 ### COMMAND LINE INTERFACE
 ```
