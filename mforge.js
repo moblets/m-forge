@@ -1,3 +1,4 @@
+#! /usr/bin/env node
 /**
  *	mForge
  *  	developer by: @leualemax in 2/5/2016
@@ -7,12 +8,6 @@ var bundler = require('./src/bundler.js');
 var dister = require('./src/dister.js');
 var colors = require('colors');
 var cli = require('cli');
-// var proprieties = require('./src/proprieties.js');
-// var webserver = require('./src/webserver.js');
-// proprieties.change('./www', 'mobile', 'production', undefined, "./www/env.json",
-// function() {
-//   console.log("passsssei carai!");
-// });
 
 /**
  * mForge Commands
