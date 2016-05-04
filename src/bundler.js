@@ -8,6 +8,7 @@ var gulp = require('gulp');
 var browserify = require('browserify');
 var gutil = require('gulp-util');
 var colors = require('colors');
+var brfs = require('brfs');
 var rename = require('gulp-rename');
 var gulpHeader = require('gulp-header');
 var vinylSource = require('vinyl-source-stream');
@@ -35,7 +36,7 @@ var bundle = {
     var outputs = [];
     location.map(function(entry) {
       console.log(colors.yellow('now building:'), entry);
-      return browserify({entries: [entry]})
+      return browserify({entries: [entry], transform: [brfs]})
             .bundle()
             .on('error', gutil.log.bind(gutil, 'Browserify Error'))
             .pipe(vinylSource(bundle.revName(entry, true)))
