@@ -6,7 +6,7 @@ USE ONLY THE CLI IN THE base-ionic-project ROOT!
 current base-ionic-project branch for use this is newMForge .
 
 ### Version
-1.0.4
+1.1.1
 
 ### PREPARE
 
