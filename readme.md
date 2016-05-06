@@ -18,6 +18,16 @@ $ m-forge prepare [-m] [-r]
  - [-m] minify the bundles
  
  - [-r] revision the bundles and create a index-rev.html file with bundles link with revision hash
+ 
+ 
+ ### DEVELOP
+
+ Run a livereload and watch server for development
+
+ ```
+ $ m-forge develop
+ ```
+  
 
 ### WEBSERVER
 

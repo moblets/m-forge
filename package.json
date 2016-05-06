@@ -1,8 +1,8 @@
 {
   "name": "m-forge",
-  "version": "1.1.1",
+  "version": "1.2.1",
   "description": "cli and function for forge moblets ",
-  "main": "mforge.js",
+  "main": "m-forge.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -19,9 +19,11 @@
   },
   "dependencies": {
     "brfs": "^1.4.3",
+    "browser-sync": "^2.12.5",
     "browserify": "^13.0.0",
     "cli": "^0.11.2",
     "colors": "^1.1.2",
+    "connect-livereload": "^0.5.4",
     "express": "^4.13.4",
     "fs": "0.0.2",
     "gulp": "^3.9.1",
@@ -32,10 +34,12 @@
     "gulp-inject": "^4.0.0",
     "gulp-manifest": "^0.1.1",
     "gulp-minify": "0.0.11",
+    "gulp-minify-css": "^1.2.4",
     "gulp-rename": "^1.2.2",
     "gulp-replace": "^0.5.4",
     "gulp-rev": "^7.0.0",
     "gulp-rev-replace": "^0.4.3",
+    "gulp-sass": "^2.3.1",
     "gulp-strip-comments": "^2.4.3",
     "gulp-strip-debug": "^1.1.0",
     "gulp-tap": "^0.1.3",
@@ -43,6 +47,7 @@
     "gulp-util": "^3.0.7",
     "mustache-express": "^1.2.2",
     "request": "^2.72.0",
+    "tiny-lr": "^0.2.1",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
     "vinyl-transform": "^1.0.0"

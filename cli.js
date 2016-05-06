@@ -1,5 +1,5 @@
 #! /usr/bin/env node
-var mForge = require('./mforge.js');
+var mForge = require('./m-forge.js');
 var cli = require('cli');
 /**
  * mForge CLI
@@ -36,6 +36,25 @@ cli.main(function(args, options) {
                                   options.rev);
               }
             });
+  } else if (args[0] === "develop") {
+    var sass  = {
+      path:[process.cwd() + '/u-base/**/*.scss',
+            process.cwd() + '/u-core/**/*.scss',
+            process.cwd() + '/u-moblets/**/*.scss'],
+      location:process.cwd() + '/u-base/u-base.scss',
+      destination:process.cwd() + "/www/css/"
+    };
+    var js  = {
+      path:[process.cwd() + '/u-base/**/*',
+            process.cwd() + '/u-core/**/*',
+            process.cwd() + '/u-moblets/**/*'],
+      location:[process.cwd() + "/u-moblets/u-moblets.js",
+                process.cwd() + "/u-core/u-core.js",
+                process.cwd() + "/u-base/u-base.js"],
+      destination:process.cwd() + "/www/bundles/"
+    }
+    var location = process.cwd() + "/www/";
+    mForge.develop.start(sass, js, location)
   }
 });
 

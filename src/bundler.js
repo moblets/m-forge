@@ -9,11 +9,13 @@ var browserify = require('browserify');
 var brfs = require('brfs');
 var rename = require('gulp-rename');
 var tap = require('gulp-tap');
+var sass = require('gulp-sass');
 var buffer = require('gulp-buffer');
 var stripDebug = require('gulp-strip-debug');
 var strip = require('gulp-strip-comments');
 var revision = require('gulp-rev');
 var minify = require('gulp-minify');
+var minifyCss = require('gulp-minify-css');
 var revReplace = require('gulp-rev-replace');
 
 var bundler = {
@@ -45,6 +47,21 @@ var bundler = {
       stream
      .pipe(rename({extname: '.bundle.js'}))
      .pipe(gulp.dest(destination));
+    }
+    return stream;
+  },
+  sass: function(location, destination, min) {
+    var stream = gulp.src(location)
+      .pipe(sass())
+      .on('error', sass.logError)
+      .pipe(gulp.dest(destination));
+    if (min) {
+      stream
+      .pipe(minifyCss({
+        keepSpecialComments: 0
+      }))
+      .pipe(rename({extname: '.min.css'}))
+      .pipe(gulp.dest(destination));
     }
     return stream;
   },
