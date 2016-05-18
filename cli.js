@@ -1,6 +1,7 @@
 #! /usr/bin/env node
 var mForge = require('./m-forge.js');
 var cli = require('cli');
+var awesome = require('awesome-logs');
 /**
  * mForge CLI
  */
@@ -23,6 +24,8 @@ var sass = {
 };
 var js = {
   path: [process.cwd() + '/u-base/**/*',
+         process.cwd() + '/www/app.js',
+         process.cwd() + '/www/index.html',
          process.cwd() + '/u-core/**/*',
          process.cwd() + '/u-moblets/**/*'],
   location: [process.cwd() + "/u-moblets/u-moblets.js",
@@ -36,6 +39,8 @@ var manifest = process.cwd() + "/www/bundles/rev-manifest.json";
 
 cli.main(function(args, options) {
   var action = args[0];
+  awesome.info("starting " + action + " build");
+  awesome.row();
   if (action === "prepare") {
     mForge.bundler.sass(sass.location, sass.destination, options.min)
          .on('end', function() {
@@ -54,7 +59,10 @@ cli.main(function(args, options) {
               }
             });
   } else if (args[0] === "develop") {
-    mForge.develop.start(sass, js, location);
+    mForge.proprieties.change(process.cwd(), "mobile", options.env,
+            options.rev, options.app, function() {
+              mForge.develop.start(sass, js, location);
+            });
   }
 });
 

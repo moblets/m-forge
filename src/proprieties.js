@@ -3,7 +3,7 @@
 *  	developer by: @leualemax in 07/12/2015
 **/
 /* eslint no-restricted-modules: [0, "colors"] */
-var colors = require('colors');
+var awesome = require('awesome-logs');
 var htmlreplace = require('gulp-html-replace');
 var path = require('path');
 var fs = require('fs');
@@ -21,7 +21,7 @@ var utils = {
   loadConfig: function(configUrl, callback) {
     require('fs').readFile(configUrl, 'utf8', function(err, data) {
       if (err) {
-        console.log(err);
+        awesome.error(err);
       } else {
         callback(data);
       }
@@ -30,7 +30,7 @@ var utils = {
   loadTemplates: function(templateUrl, callback) {
     fs.readFile(templateUrl, 'utf8', function(err, data) {
       if (err) {
-        console.log(err);
+        awesome.error(err);
       } else {
         callback(data);
       }
@@ -125,6 +125,14 @@ var utils = {
 
 var _proprieties = {
   change: function(location, target, env, rev, id, callback) {
+    awesome.row();
+    awesome.info("changing app properties:");
+    awesome.row();
+    console.log("‣ id : " + id);
+    console.log("‣ target : " + target);
+    console.log("‣ environment : " + env);
+    console.log("‣ is revision : " + rev);
+    awesome.row();
     var config = location + "/env." + env + ".json";
     utils.loadConfig(config, function(data) {
       var configFile = JSON.parse(data);

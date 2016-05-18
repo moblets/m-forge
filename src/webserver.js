@@ -6,7 +6,7 @@
 var express = require('express');
 var mustacheExpress = require('mustache-express');
 var request = require('request');
-var colors = require('colors');
+var awesome = require('awesome-logs');
 var app = express();
 
 var utils = {
@@ -14,7 +14,7 @@ var utils = {
     var config = location + "/env." + env + ".json";
     require('fs').readFile(config, 'utf8', function(err, data) {
       if (err) {
-        console.log(err);
+        awesome.error(err);
       } else {
         callback(JSON.parse(data).API_URL);
       }
@@ -37,25 +37,24 @@ var utils = {
       var appData = null;
       try {
         appData = utils.jsonParser(body);
-        console.log(
-          colors.green(new Date() + ' - app ' + appData.appName),
-          colors.yellow(' id ' + appData.appId), ' requested');
+        awesome.info("app: " + appData.appName + " - " +
+                      appData.appId + " requested");
         if (rev) {
           res.render('index-rev', appData);
         } else {
           res.render('index', appData);
         }
       } catch (e) {
-        console.log(colors.red(new Date() + " - erro requestin app - ",
-                    requestParam));
-        console.log(colors.red("error :"), e);
+        awesome.row();
+        awesome.error("erro requestin app " + requestParam);
+        awesome.error(e);
+        awesome.row();
       }
     });
   }
 };
 
 var webserver = function(location, port, env, rev) {
-  console.log(location + "/www");
   utils.loadConfig(location, env, function(config) {
     app.engine('html', mustacheExpress());
     app.set('view engine', 'html');
@@ -89,8 +88,8 @@ var webserver = function(location, port, env, rev) {
       utils.requestAppAndRender(url, rev, req, res, req.params.appId);
     });
     app.listen(port || 3000, function() {
-      console.log(colors.green('preview server running on port:'),
-                  colors.red(port || 3000));
+      awesome.success('preview server running on port: ' + (port || 3000));
+      awesome.row();
     });
   });
 };

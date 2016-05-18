@@ -7,12 +7,14 @@ var bundler = require('./src/bundler.js');
 var proprieties = require('./src/proprieties.js');
 var webserver = require('./src/webserver.js');
 var develop = require('./src/develop.js');
+var moblet = require('./src/moblet.js');
 
 /**
  * mForge Commands
  */
 var mForge = {
   bundler: bundler,
+  moblet: moblet,
   proprieties: proprieties,
   webserver: webserver,
   develop: develop

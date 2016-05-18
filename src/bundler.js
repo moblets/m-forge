@@ -17,9 +17,20 @@ var revision = require('gulp-rev');
 var minify = require('gulp-minify');
 var minifyCss = require('gulp-minify-css');
 var revReplace = require('gulp-rev-replace');
+var awesome = require('awesome-logs');
 
 var bundler = {
   compile: function(location, destination, min, rev) {
+    if (typeof location === "string") {
+      location = [location];
+    }
+    awesome.row();
+    awesome.info("building bundles for for: ");
+    awesome.row();
+    for (var i = 0; i < location.length; i++) {
+      console.log("‣" + location[i]);
+    }
+    awesome.row();
     var stream = gulp.src(location, {read: false})
           .pipe(tap(function(file) {
             file.contents = browserify(file.path, {transform: [brfs]}).bundle();
@@ -51,6 +62,16 @@ var bundler = {
     return stream;
   },
   sass: function(location, destination, min) {
+    if (typeof location === "string") {
+      location = [location];
+    }
+    awesome.row();
+    awesome.info("building sass for for: ");
+    awesome.row();
+    for (var i = 0; i < location.length; i++) {
+      console.log("‣" + location[i]);
+    }
+    awesome.row();
     var stream = gulp.src(location)
       .pipe(sass())
       .on('error', sass.logError)
