@@ -1,7 +1,6 @@
-
 /**
- *	Bundler  - bundle the browserify dependece and turn it on a angular module.
- *  	developer by: @leualemax in 10/12/2015
+ *    Bundler  - bundle the browserify dependece and turn it on a angular module.
+ *      developer by: @leualemax in 10/12/2015
  **/
 /* eslint no-restricted-modules: ["error", "fs", "cluster"]  */
 var gulp = require('gulp');
@@ -32,39 +31,55 @@ var bundler = {
       console.log("‣" + location[i]);
     }
     awesome.row();
-    var stream = gulp.src(location, {read: false})
-          .pipe(tap(function(file) {
-            file.contents = browserify(file.path, {transform: [brfs]})
-                            .transform(sassify, {
-                              'auto-inject': true, // Inject css directly in the code
-                              'base64Encode': false, // Use base64 to inject css
-                              'sourceMap': false // Add source map to the code
-                            })
-                            .bundle();
-          }))
-          .pipe(buffer());
+    var stream = gulp.src(location, {
+      read: false
+    })
+      .pipe(tap(function(file) {
+        file.contents = browserify({})
+          .transform(sassify, {
+            'auto-inject': true, // Inject css directly in the code
+            'base64Encode': false, // Use base64 to inject css
+            'sourceMap': false // Add source map to the code
+          })
+          .transform(brfs, {})
+          .add(file.path)
+          .bundle();
+      }))
+      .pipe(buffer());
     if (min) {
       stream
-      .pipe(stripDebug())
-      .pipe(strip())
-      .pipe(minify({noSource: true, mangle: false, ext: {min: '.js'}}));
+        .pipe(stripDebug())
+        .pipe(strip())
+        .pipe(minify({
+          noSource: true,
+          mangle: false,
+          ext: {
+            min: '.js'
+          }
+        }));
       if (rev) {
         stream
-        .pipe(rename({extname: '.bundle.js'}))
-        .pipe(gulp.dest(destination))
-        .pipe(revision())
-        .pipe(gulp.dest(destination))
-        .pipe(revision.manifest())
-        .pipe(gulp.dest(destination));
+          .pipe(rename({
+            extname: '.bundle.js'
+          }))
+          .pipe(gulp.dest(destination))
+          .pipe(revision())
+          .pipe(gulp.dest(destination))
+          .pipe(revision.manifest())
+          .pipe(gulp.dest(destination));
       } else {
         stream
-       .pipe(rename({extname: '.bundle.js'}))
-       .pipe(gulp.dest(destination));
+          .pipe(rename({
+            extname: '.bundle.js'
+          }))
+          .pipe(gulp.dest(destination));
       }
     } else {
       stream
-     .pipe(rename({extname: '.bundle.js'}))
-     .pipe(gulp.dest(destination));
+        .pipe(rename({
+          extname: '.bundle.js'
+        }))
+        .pipe(gulp.dest(destination));
     }
     return stream;
   },
@@ -85,20 +100,24 @@ var bundler = {
       .pipe(gulp.dest(destination));
     if (min) {
       stream
-      .pipe(minifyCss({
-        keepSpecialComments: 0
-      }))
-      .pipe(rename({extname: '.min.css'}))
-      .pipe(gulp.dest(destination));
+        .pipe(minifyCss({
+          keepSpecialComments: 0
+        }))
+        .pipe(rename({
+          extname: '.min.css'
+        }))
+        .pipe(gulp.dest(destination));
     }
     return stream;
   },
   replace: function(manifest, index) {
     setTimeout(function() {
       return gulp.src(index + "index.html")
-      .pipe(rename('index-rev.html'))
-      .pipe(revReplace({manifest: gulp.src(manifest)}))
-      .pipe(gulp.dest(index));
+        .pipe(rename('index-rev.html'))
+        .pipe(revReplace({
+          manifest: gulp.src(manifest)
+        }))
+        .pipe(gulp.dest(index));
     }, 5000);
   }
 };
