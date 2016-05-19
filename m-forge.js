@@ -1,6 +1,6 @@
 /**
  *	mForge
- *  	developer by: @leualemax in 2/5/2016
+ *  	developer by: @leualemax in 2/5/2016 
  **/
 /* eslint no-restricted-modules: [ "error", "fs", "cluster"]  */
 var bundler = require('./src/bundler.js');
