@@ -11,6 +11,7 @@ var rename = require('gulp-rename');
 var tap = require('gulp-tap');
 var sass = require('gulp-sass');
 var buffer = require('gulp-buffer');
+var sassify = require('sassify');
 var stripDebug = require('gulp-strip-debug');
 var strip = require('gulp-strip-comments');
 var revision = require('gulp-rev');
@@ -33,7 +34,13 @@ var bundler = {
     awesome.row();
     var stream = gulp.src(location, {read: false})
           .pipe(tap(function(file) {
-            file.contents = browserify(file.path, {transform: [brfs]}).bundle();
+            file.contents = browserify(file.path, {transform: [brfs]})
+                            .transform(sassify, {
+                              'auto-inject': true, // Inject css directly in the code
+                              'base64Encode': false, // Use base64 to inject css
+                              'sourceMap': false // Add source map to the code
+                            })
+                            .bundle();
           }))
           .pipe(buffer());
     if (min) {

@@ -39,6 +39,7 @@ var manifest = process.cwd() + "/www/bundles/rev-manifest.json";
 
 cli.main(function(args, options) {
   var action = args[0];
+  awesome.row();
   awesome.info("starting " + action + " build");
   awesome.row();
   if (action === "prepare") {
