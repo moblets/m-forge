@@ -7,7 +7,6 @@ var gulp = require('gulp');
 var browserify = require('browserify');
 var brfs = require('brfs');
 var rename = require('gulp-rename');
-var tap = require('gulp-tap');
 var sass = require('gulp-sass');
 var buffer = require('gulp-buffer');
 var sassify = require('sassify');
@@ -17,38 +16,39 @@ var revision = require('gulp-rev');
 var minify = require('gulp-minify');
 var minifyCss = require('gulp-minify-css');
 var revReplace = require('gulp-rev-replace');
+var vinylSource = require('vinyl-source-stream');
 var awesome = require('awesome-logs');
+var q = require('q');
 
 var bundler = {
-  compile: function(location, destination, min, rev) {
-    if (typeof location === "string") {
-      location = [location];
+  bundleName: function(location) {
+    var splited = location.split("js");
+    var name = "";
+    if (splited[0].trim() === "") {
+      name = false;
+    } else {
+      var urlSplited = splited[0].trim().split("/");
+      name = urlSplited[urlSplited.length - 1];
     }
-    awesome.row();
-    awesome.info("building bundles for for: ");
-    awesome.row();
-    for (var i = 0; i < location.length; i++) {
-      console.log("‣" + location[i]);
-    }
-    awesome.row();
-    var stream = gulp.src(location, {
-      read: false
+    return name;
+  },
+  build: function(location, destination, min, rev) {
+    var deferred = q.defer();
+    var mobletName = bundler.bundleName(location);
+    var stream = browserify({})
+    .transform(sassify, {
+      'auto-inject': true, // Inject css directly in the code
+      'base64Encode': false, // Use base64 to inject css
+      'sourceMap': false // Add source map to the code
     })
-      .pipe(tap(function(file) {
-        file.contents = browserify({})
-          .transform(sassify, {
-            'auto-inject': true, // Inject css directly in the code
-            'base64Encode': false, // Use base64 to inject css
-            'sourceMap': false // Add source map to the code
-          })
-          .transform(brfs, {})
-          .add(file.path)
-          .bundle();
-      }))
-      .pipe(buffer());
+    .transform(brfs, {})
+    .add(location)
+    .bundle()
+    .pipe(vinylSource(mobletName + "bundle.js"))
+    .pipe(gulp.dest(destination))
+    .pipe(buffer());
     if (min) {
-      stream
-        .pipe(stripDebug())
+      stream.pipe(stripDebug())
         .pipe(strip())
         .pipe(minify({
           noSource: true,
@@ -56,32 +56,40 @@ var bundler = {
           ext: {
             min: '.js'
           }
-        }));
-      if (rev) {
-        stream
-          .pipe(rename({
-            extname: '.bundle.js'
-          }))
-          .pipe(gulp.dest(destination))
-          .pipe(revision())
-          .pipe(gulp.dest(destination))
-          .pipe(revision.manifest())
-          .pipe(gulp.dest(destination));
-      } else {
-        stream
-          .pipe(rename({
-            extname: '.bundle.js'
-          }))
-          .pipe(gulp.dest(destination));
-      }
-    } else {
-      stream
-        .pipe(rename({
-          extname: '.bundle.js'
         }))
         .pipe(gulp.dest(destination));
     }
-    return stream;
+    if (rev) {
+      stream
+      .pipe(gulp.dest(destination))
+      .pipe(revision())
+      .pipe(gulp.dest(destination))
+      .pipe(revision.manifest())
+      .pipe(gulp.dest(destination));
+      stream.on('end', function(e) {
+        if (e) {
+          deferred.reject();
+        } else {
+          deferred.resolve();
+        }
+      });
+      return deferred.promise;
+    }
+  },
+  compile: function(location, destination, min, rev) {
+    var deferred = q.defer();
+    var promises = [];
+    if (typeof location === "string") {
+      promises.push(bundler.build(location, destination, min, rev));
+    } else {
+      for (var i = 0; i < location.length; i++) {
+        promises.push(bundler.build(location[i], destination, min, rev));
+      }
+    }
+    q.all(promises).then(function() {
+      deferred.resolve();
+    });
+    return deferred.promise;
   },
   sass: function(location, destination, min) {
     if (typeof location === "string") {

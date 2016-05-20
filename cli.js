@@ -47,7 +47,7 @@ cli.main(function(args, options) {
          .on('end', function() {
            mForge.bundler.compile(js.location, destination,
                                    options.min, options.rev)
-                   .on("end", function() {
+                   .then(function() {
                      mForge.bundler.replace(manifest, location);
                    });
          });
