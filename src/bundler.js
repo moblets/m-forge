@@ -45,10 +45,12 @@ var bundler = {
     .add(location)
     .bundle()
     .pipe(vinylSource(mobletName + "bundle.js"))
-    .pipe(gulp.dest(destination))
-    .pipe(buffer());
-    if (min) {
-      stream.pipe(stripDebug())
+    .pipe(gulp.dest(destination));
+    stream.on('end', function() {
+      var newStream;
+      if (min) {
+        newStream = gulp.src(destination + mobletName + "bundle.js")
+        .pipe(stripDebug())
         .pipe(strip())
         .pipe(minify({
           noSource: true,
@@ -58,31 +60,36 @@ var bundler = {
           }
         }))
         .pipe(gulp.dest(destination));
-    }
-    if (rev) {
-      stream
-      .pipe(gulp.dest(destination))
-      .pipe(revision())
-      .pipe(gulp.dest(destination))
-      .pipe(revision.manifest())
-      .pipe(gulp.dest(destination));
-      stream.on('end', function(e) {
-        if (e) {
-          deferred.reject();
-        } else {
-          deferred.resolve();
+        if (rev) {
+          newStream
+          // .pipe(buffer())
+          .pipe(gulp.dest(destination))
+          .pipe(revision())
+          .pipe(gulp.dest(destination))
+          .pipe(revision.manifest())
+          .pipe(gulp.dest(destination));
         }
-      });
-      return deferred.promise;
-    }
+        newStream.on('end', function() {
+          deferred.resolve();
+        });
+      } else {
+        deferred.resolve();
+      }
+    });
+    return deferred.promise;
   },
   compile: function(location, destination, min, rev) {
     var deferred = q.defer();
     var promises = [];
+    awesome.row();
+    awesome.info("building bundles for for: ");
+    awesome.row();
     if (typeof location === "string") {
+      awesome.info("‣ " + location);
       promises.push(bundler.build(location, destination, min, rev));
     } else {
       for (var i = 0; i < location.length; i++) {
+        awesome.info("‣ " + location[i]);
         promises.push(bundler.build(location[i], destination, min, rev));
       }
     }

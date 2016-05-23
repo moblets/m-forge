@@ -49,6 +49,8 @@ cli.main(function(args, options) {
                                    options.min, options.rev)
                    .then(function() {
                      mForge.bundler.replace(manifest, location);
+                     awesome
+                     .success("🎉 Bundles and Sass successfully compiled 🎉");
                    });
          });
   } else if (args[0] === "webserver" || args[0] === "mobile") {
