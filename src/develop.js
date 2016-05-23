@@ -22,8 +22,8 @@ var develop = {
     javascript: function(path, location, destination) {
       gulp.watch(path, function(event) {
         return bundler.compile(location, destination,
-                              true, true)
-                .on('end', function() {
+                              false, false)
+                .then(function() {
                   browserSync.reload(event);
                 });
       });
