@@ -35,39 +35,41 @@ var bundler = {
   build: function(location, destination, min, rev) {
     var deferred = q.defer();
     var mobletName = bundler.bundleName(location);
-    var stream = browserify({})
-    .transform(sassify, {
-      'auto-inject': true, // Inject css directly in the code
-      'base64Encode': false, // Use base64 to inject css
-      'sourceMap': false // Add source map to the code
+    var stream = browserify({
+      paths: ['./node_modules']
     })
-    .transform(brfs, {})
-    .add(location)
-    .bundle()
-    .pipe(vinylSource(mobletName + "bundle.js"))
-    .pipe(gulp.dest(destination));
+      .transform(sassify, {
+        'auto-inject': true, // Inject css directly in the code
+        'base64Encode': false, // Use base64 to inject css
+        'sourceMap': false // Add source map to the code
+      })
+      .transform(brfs, {})
+      .add(location)
+      .bundle()
+      .pipe(vinylSource(mobletName + "bundle.js"))
+      .pipe(gulp.dest(destination));
     stream.on('end', function() {
       var newStream;
       if (min) {
         newStream = gulp.src(destination + mobletName + "bundle.js")
-        .pipe(stripDebug())
-        .pipe(strip())
-        .pipe(minify({
-          noSource: true,
-          mangle: false,
-          ext: {
-            min: '.js'
-          }
-        }))
-        .pipe(gulp.dest(destination));
+          .pipe(stripDebug())
+          .pipe(strip())
+          .pipe(minify({
+            noSource: true,
+            mangle: false,
+            ext: {
+              min: '.js'
+            }
+          }))
+          .pipe(gulp.dest(destination));
         if (rev) {
           newStream
-          // .pipe(buffer())
-          .pipe(gulp.dest(destination))
-          .pipe(revision())
-          .pipe(gulp.dest(destination))
-          .pipe(revision.manifest())
-          .pipe(gulp.dest(destination));
+            // .pipe(buffer())
+            .pipe(gulp.dest(destination))
+            .pipe(revision())
+            .pipe(gulp.dest(destination))
+            .pipe(revision.manifest())
+            .pipe(gulp.dest(destination));
         }
         newStream.on('end', function() {
           deferred.resolve();

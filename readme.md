@@ -20,14 +20,35 @@ $ m-forge prepare [-m] [-r]
  - [-r] revision the bundles and create a index-rev.html file with bundles link with revision hash
  
  
- ### DEVELOP
+### MOBLET DEVELOP
 
- Run a livereload and watch server for development
+Run a livereload and watch server for development a moblet, and inject the moblet bundle in base-ionic-project and watchs it too.
 
- ```
- $ m-forge develop
- ```
-  
+```
+$ m-forge moblet <moblet-name> <moblet-project-folder>  [-a <appId>] [-e <environment>]
+```
+- [-e] set the environment of server and app, possibles 'dev' , 'local' , 'production'
+
+- [-p] the server port
+
+- [-r] use the revision index-rev.html file made in prepare
+
+
+
+### DEVELOP
+
+Run a livereload and watch server for development
+
+```
+$ m-forge develop  [-a <appId>] [-e <environment>]
+```
+- [-e] set the environment of server and app, possibles 'dev' , 'local' , 'production'
+
+- [-p] the server port
+
+- [-r] use the revision index-rev.html file made in prepare
+
+
 
 ### WEBSERVER
 
@@ -37,23 +58,21 @@ Prepare and run a webserver in express with base-ionic-project, read a file with
 $ m-forge webserver [-p <port>] [-e <environment>] [-r]
 ```
 
- - [-e] set the environment of server and app, possibles 'dev' , 'local' , 'production'
- 
- - [-p] the server port
- 
- - [-r] use the revision index-rev.html file made in prepare
- 
- 
- ### MOBILE
+- [-e] set the environment of server and app, possibles 'dev' , 'local' , 'production'
 
- Prepare the base-ionic-project to be build for mobile
+- [-p] the server port
 
- ```
- $ m-forge mobile [-a <appId>] [-e <environment>]
- ```
+- [-r] use the revision index-rev.html file made in prepare
 
-  - [-e] set the environment of server and app, possibles 'dev' , 'local' , 'production'
-  
-  - [-a] the app id. default is the test_superclasses id.
-  
-  
+
+### MOBILE
+
+Prepare the base-ionic-project to be build for mobile
+
+```
+$ m-forge mobile [-a <appId>] [-e <environment>]
+```
+
+- [-e] set the environment of server and app, possibles 'dev' , 'local' , 'production'
+
+- [-a] the app id. default is the test_superclasses id.

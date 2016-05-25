@@ -42,29 +42,36 @@ var utils = {
   changeIndexHtml: function(target, file, dest, callback) {
     utils.replaceTags(target, file, dest, function() {
       utils.replaceSrcs(target, file, dest)
-       .on("end", function() {
-         callback();
-       });
+        .on("end", function() {
+          callback();
+        });
     });
   },
   replaceTags: function(target, file, dest, callback) {
     var templateWeb;
     var templateMobile;
     utils.loadTemplates(path.join(__dirname, '/templates/mobile.html'),
-    function(mobile) {
-      templateMobile = mobile;
-      utils.loadTemplates(path.join(__dirname, '/templates/web.html'),
-      function(web) {
-        templateWeb = web;
-        var tempTo = (target === "web") ? templateWeb : templateMobile;
-        gulp.src(file)
-        .pipe(htmlreplace({tags: tempTo}, {keepBlockTags: true}))
-        /* eslint camelcase: 0 */
-        .pipe(prettify({indent_char: ' ', indent_size: 2}))
-        .pipe(gulp.dest(dest))
-        .on('end', callback);
+      function(mobile) {
+        templateMobile = mobile;
+        utils.loadTemplates(path.join(__dirname, '/templates/web.html'),
+          function(web) {
+            templateWeb = web;
+            var tempTo = (target === "web") ? templateWeb : templateMobile;
+            gulp.src(file)
+              .pipe(htmlreplace({
+                tags: tempTo
+              }, {
+                keepBlockTags: true
+              }))
+              /* eslint camelcase: 0 */
+              .pipe(prettify({
+                indent_char: ' ',
+                indent_size: 2
+              }))
+              .pipe(gulp.dest(dest))
+              .on('end', callback);
+          });
       });
-    });
   },
   replaceSrcs: function(target, file, dest) {
     var REGEX_SRC_WEB = /(src="\/)(?!https:\/\/)(?!http:\/\/)(.*)/ig;
@@ -87,27 +94,41 @@ var utils = {
       regHrefTo = "href=\"$2";
     }
     return gulp.src(file)
-    .pipe(replace(regSrcFrom, regSrcTo))
-    .pipe(replace(regHrefFrom, regHrefTo))
-    .pipe(gulp.dest(dest));
+      .pipe(replace(regSrcFrom, regSrcTo))
+      .pipe(replace(regHrefFrom, regHrefTo))
+      .pipe(gulp.dest(dest));
+  },
+  addDevSrc: function(src, file, dest) {
+    var template = (src) ? '<script src="bundles/' + src + '"></script>' : "";
+    return gulp.src(file)
+      .pipe(htmlreplace({
+        dev: template
+      }, {
+        keepBlockTags: true
+      }))
+      .pipe(prettify({
+        indent_char: ' ',
+        indent_size: 2
+      }))
+      .pipe(gulp.dest(dest));
   },
   /*
    * FOR APP.JS FILE
    */
   changeAppJS: function(env, target, id, file, dest, config, callback) {
     utils.replaceEnvs(env, file, dest, config)
-    .on("end", function() {
-      utils.replaceIdentifier(target, id, file, dest)
       .on("end", function() {
-        callback();
+        utils.replaceIdentifier(target, id, file, dest)
+          .on("end", function() {
+            callback();
+          });
       });
-    });
   },
   replaceEnvs: function(env, file, dest, config) {
     var regTo = utils.createApiConstant(config.API_URL);
     return gulp.src(file)
-    .pipe(replace(RGX_APPURL_DIGIT, regTo))
-    .pipe(gulp.dest(dest));
+      .pipe(replace(RGX_APPURL_DIGIT, regTo))
+      .pipe(gulp.dest(dest));
   },
   replaceIdentifier: function(target, id, file, dest) {
     var regTo;
@@ -117,14 +138,14 @@ var utils = {
       regTo = ".constant('APP_ID', '" + id + "')";
     }
     return gulp.src(file)
-    .pipe(replace(RGX_APPID_DIGIT, regTo))
-    .pipe(gulp.dest(dest));
+      .pipe(replace(RGX_APPID_DIGIT, regTo))
+      .pipe(gulp.dest(dest));
   }
 
 };
 
 var _proprieties = {
-  change: function(location, target, env, rev, id, callback) {
+  change: function(location, target, env, rev, id, dev, callback) {
     awesome.row();
     awesome.info("changing app properties:");
     awesome.row();
@@ -138,12 +159,15 @@ var _proprieties = {
       var configFile = JSON.parse(data);
       var targetAppFile = location + '/www/app.js';
       var targetIndexFile = (rev) ? location + '/www/index-rev.html' :
-                                    location + '/www/index.html';
+        location + '/www/index.html';
       utils.changeIndexHtml(target, targetIndexFile, location + "/www/",
-      function() {
-        utils.changeAppJS(env, target, id, targetAppFile, location + "/www/",
-          configFile, callback);
-      });
+        function() {
+          utils.changeAppJS(env, target, id, targetAppFile, location + "/www/",
+            configFile, function() {
+              utils.addDevSrc(dev, targetIndexFile, location + "/www/")
+                .on('end', callback);
+            });
+        });
     });
   }
 };
