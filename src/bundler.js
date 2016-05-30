@@ -115,16 +115,16 @@ var bundler = {
       .pipe(sass())
       .on('error', sass.logError)
       .pipe(gulp.dest(destination));
-    if (min) {
-      stream
-        .pipe(minifyCss({
-          keepSpecialComments: 0
-        }))
-        .pipe(rename({
-          extname: '.min.css'
-        }))
-        .pipe(gulp.dest(destination));
-    }
+
+    stream
+      .pipe(minifyCss({
+        keepSpecialComments: 0
+      }))
+      .pipe(rename({
+        extname: '.min.css'
+      }))
+      .pipe(gulp.dest(destination));
+
     return stream;
   },
   replace: function(manifest, index) {

@@ -37,22 +37,31 @@ var location = process.cwd() + "/www/";
 var destination = process.cwd() + "/www/bundles/";
 var manifest = process.cwd() + "/www/bundles/rev-manifest.json";
 
-cli.main(function(args, options) {
-  var action = args[0];
-  awesome.row();
-  awesome.info("starting " + action + " build");
-  awesome.row();
-  if (action === "prepare") {
+
+var routines = {
+  resources: function(args, options, callback) {
     mForge.bundler.sass(sass.location, sass.destination, options.min)
       .on('end', function() {
         mForge.bundler.compile(js.location, destination,
           options.min, options.rev)
           .then(function() {
             mForge.bundler.replace(manifest, location);
-            awesome
-              .success("🎉 Bundles and Sass successfully compiled 🎉");
+            callback();
           });
       });
+  }
+};
+
+cli.main(function(args, options) {
+  var action = args[0];
+  awesome.row();
+  awesome.info("starting " + action + " build");
+  awesome.row();
+  if (action === "prepare") {
+    routines.resources(args, options, function() {
+      awesome
+        .success("🎉 Bundles and Sass successfully compiled 🎉");
+    });
   } else if (args[0] === "webserver" || args[0] === "mobile") {
     mForge.proprieties.change(process.cwd(), options.target, options.env,
       options.rev, options.app, undefined, function() {
@@ -62,24 +71,25 @@ cli.main(function(args, options) {
         }
       });
   } else if (args[0] === "develop") {
-    mForge.proprieties.change(process.cwd(), "mobile", options.env,
-      options.rev, options.app, undefined, function() {
-        mForge.develop.start(sass, js, location);
-      });
+    routines.resources(args, options, function() {
+      awesome
+        .success("🎉 Bundles and Sass successfully compiled 🎉");
+      mForge.proprieties.change(process.cwd(), "mobile", options.env,
+        options.rev, options.app, undefined, function() {
+          mForge.develop.start(sass, js, location);
+        });
+    });
   } else if (args[0] === "moblet") {
     js.path.push(args[2] + "/moblet/**/*");
     js.location.push(args[2] + "/moblet/" + args[1] + ".js");
-    mForge.bundler.compile(js.location, destination,
-      options.min, options.rev)
-      .then(function() {
-        mForge.bundler.replace(manifest, location);
-        awesome
-          .success("🎉 Bundles and Sass successfully compiled 🎉");
-        mForge.proprieties.change(process.cwd(), "mobile", options.env,
-          options.rev, options.app, args[1] + ".bundle.js", function() {
-            mForge.develop.start(sass, js, location);
-          });
-      });
+    routines.resources(args, options, function() {
+      awesome
+        .success("🎉 Bundles and Sass successfully compiled 🎉");
+      mForge.proprieties.change(process.cwd(), "mobile", options.env,
+        options.rev, options.app, args[1] + ".bundle.js", function() {
+          mForge.develop.start(sass, js, location);
+        });
+    });
   }
 });
 
