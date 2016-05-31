@@ -18,6 +18,8 @@ var minifyCss = require('gulp-minify-css');
 var revReplace = require('gulp-rev-replace');
 var vinylSource = require('vinyl-source-stream');
 var awesome = require('awesome-logs');
+var mustache = require("gulp-mustache");
+var mobletfy = require("./moblet");
 var q = require('q');
 
 var bundler = {
@@ -38,6 +40,7 @@ var bundler = {
     var stream = browserify({
       paths: ['./node_modules']
     })
+      .transform(mobletfy)
       .transform(sassify, {
         'auto-inject': true, // Inject css directly in the code
         'base64Encode': false, // Use base64 to inject css

@@ -4,9 +4,52 @@
  *  	developer by: @leualemax in 10/12/2015
  **/
 /* eslint no-restricted-modules: ["error", "fs", "cluster"]  */
-var gulp = require('gulp');
+var transformTools = require('browserify-transform-tools');
+var path = require('path');
+var fs = require('fs');
+var parseContex = require('parse-code-context');
+var _eval = require('eval');
 
-var moblet = {
+var options = {
+  excludeExtensions: [".json"]
 };
 
-module.exports = moblet;
+module.exports = transformTools.makeStringTransform("mobletfy", options,
+  function(content, transformOptions, done) {
+    var file = transformOptions.file;
+
+
+    var mobletTemplatePath = path.join(__dirname, "./templates/moblet.js");
+    var mobletTemplate = fs.readFileSync(mobletTemplatePath, 'utf8').toString();
+
+    if (!transformOptions.config) {
+      return done(new Error("Could not find unbluify configuration."));
+    }
+    try {
+
+      var moblet = _eval(content);
+      mobletTemplate = mobletTemplate.replace(/<%moblet-title%>/ig, moblet.title);
+      mobletTemplate = mobletTemplate.replace(/<%moblet-style%>/ig, moblet.style);
+      // console.log(moblet.controller.toString());
+      mobletTemplate = mobletTemplate.replace(/<%moblet-controller%>/ig, moblet.controller.toString());
+      mobletTemplate = mobletTemplate.replace(/<%moblet-link%>/ig, moblet.link.toString());
+      mobletTemplate = mobletTemplate.replace(/<%moblet-template%>/ig, moblet.template);
+
+
+      var langs = moblet.i18n;
+      var stringLangs = "";
+      for (var lang in langs) {
+        stringLangs += "lang['" + lang + "'] = fs.readFileSync(path.join(__dirname, '" + langs[lang] + "'), 'utf8'); \n";
+      }
+
+      mobletTemplate = mobletTemplate.replace(/<%moblet-langs%>/ig, stringLangs);
+
+
+      console.log(mobletTemplate);
+      return done(null, mobletTemplate);
+
+    } catch (e) {
+      // console.log("deu ruim", e);
+      return done(null, content);
+    }
+  });
