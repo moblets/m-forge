@@ -39,7 +39,7 @@ module.exports = transformTools.makeStringTransform("mobletfy", options,
       var langs = moblet.i18n;
       var stringLangs = "";
       for (var lang in langs) {
-        stringLangs += "lang['" + lang + "'] = fs.readFileSync(path.join(__dirname, '" + langs[lang] + "'), 'utf8'); \n";
+        stringLangs += "langs['" + lang + "'] = JSON.parse(fs.readFileSync(path.join(__dirname, '" + langs[lang] + "'), 'utf8')); \n";
       }
 
       mobletTemplate = mobletTemplate.replace(/<%moblet-langs%>/ig, stringLangs);
