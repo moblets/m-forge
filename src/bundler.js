@@ -18,7 +18,6 @@ var minifyCss = require('gulp-minify-css');
 var revReplace = require('gulp-rev-replace');
 var vinylSource = require('vinyl-source-stream');
 var awesome = require('awesome-logs');
-var mustache = require("gulp-mustache");
 var mobletfy = require("./moblet");
 var q = require('q');
 
