@@ -7,7 +7,6 @@
 var transformTools = require('browserify-transform-tools');
 var path = require('path');
 var fs = require('fs');
-var parseContex = require('parse-code-context');
 var _eval = require('eval');
 
 var options = {
@@ -26,28 +25,27 @@ module.exports = transformTools.makeStringTransform("mobletfy", options,
       return done(new Error("Could not find unbluify configuration."));
     }
     try {
-
       var moblet = _eval(content);
-      mobletTemplate = mobletTemplate.replace(/<%moblet-title%>/ig, moblet.title);
-      mobletTemplate = mobletTemplate.replace(/<%moblet-style%>/ig, moblet.style);
+      mobletTemplate =
+                mobletTemplate.replace(/<%moblet-title%>/ig, moblet.title);
+      mobletTemplate =
+                mobletTemplate.replace(/<%moblet-style%>/ig, moblet.style);
       // console.log(moblet.controller.toString());
-      mobletTemplate = mobletTemplate.replace(/<%moblet-controller%>/ig, moblet.controller.toString());
-      mobletTemplate = mobletTemplate.replace(/<%moblet-link%>/ig, moblet.link.toString());
-      mobletTemplate = mobletTemplate.replace(/<%moblet-template%>/ig, moblet.template);
-
-
+      mobletTemplate = mobletTemplate.replace(/<%moblet-controller%>/ig,
+                                              moblet.controller.toString());
+      mobletTemplate = mobletTemplate.replace(/<%moblet-link%>/ig,
+                                              moblet.link.toString());
+      mobletTemplate = mobletTemplate.replace(/<%moblet-template%>/ig,
+                                              moblet.template);
       var langs = moblet.i18n;
       var stringLangs = "";
       for (var lang in langs) {
-        stringLangs += "langs['" + lang + "'] = JSON.parse(fs.readFileSync(path.join(__dirname, '" + langs[lang] + "'), 'utf8')); \n";
+        stringLangs += "langs['" + lang +
+        "'] = JSON.parse(fs.readFileSync(path.join(__dirname, '" +
+         langs[lang] + "'), 'utf8')); \n";
       }
-
       mobletTemplate = mobletTemplate.replace(/<%moblet-langs%>/ig, stringLangs);
-
-
-      console.log(mobletTemplate);
       return done(null, mobletTemplate);
-
     } catch (e) {
       // console.log("deu ruim", e);
       return done(null, content);
