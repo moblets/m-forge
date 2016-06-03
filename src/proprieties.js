@@ -39,17 +39,18 @@ var utils = {
   /*
    * FOR INDEX.HTML FILE
    */
-  changeIndexHtml: function(target, file, dest, callback) {
-    utils.replaceTags(target, file, dest, function() {
+  changeIndexHtml: function(target, file, dest, dev, callback) {
+    utils.replaceTags(target, file, dest, dev, function() {
       utils.replaceSrcs(target, file, dest)
         .on("end", function() {
           callback();
         });
     });
   },
-  replaceTags: function(target, file, dest, callback) {
+  replaceTags: function(target, file, dest, dev, callback) {
     var templateWeb;
     var templateMobile;
+    var templateDev = (dev) ? '<script src="bundles/' + dev + '"></script>' : "";
     utils.loadTemplates(path.join(__dirname, '/templates/mobile.html'),
       function(mobile) {
         templateMobile = mobile;
@@ -59,7 +60,8 @@ var utils = {
             var tempTo = (target === "web") ? templateWeb : templateMobile;
             gulp.src(file)
               .pipe(htmlreplace({
-                tags: tempTo
+                tags: tempTo,
+                dev: templateDev
               }, {
                 keepBlockTags: true
               }))
@@ -160,13 +162,10 @@ var _proprieties = {
       var targetAppFile = location + '/www/app.js';
       var targetIndexFile = (rev) ? location + '/www/index-rev.html' :
         location + '/www/index.html';
-      utils.changeIndexHtml(target, targetIndexFile, location + "/www/",
+      utils.changeIndexHtml(target, targetIndexFile, location + "/www/", dev,
         function() {
           utils.changeAppJS(env, target, id, targetAppFile, location + "/www/",
-            configFile, function() {
-              utils.addDevSrc(dev, targetIndexFile, location + "/www/")
-                .on('end', callback);
-            });
+            configFile, callback);
         });
     });
   }
