@@ -59,8 +59,11 @@ cli.main(function(args, options) {
   awesome.row();
   if (action === "prepare") {
     routines.resources(args, options, function() {
-      awesome
-        .success("🎉 Bundles and Sass successfully compiled 🎉");
+      mForge.proprieties.change(process.cwd(), options.target, options.env,
+      options.rev, options.app, undefined, function() {
+        awesome
+          .success("🎉 Bundles and Sass successfully compiled 🎉");
+      });
     });
   } else if (args[0] === "webserver" || args[0] === "mobile") {
     mForge.proprieties.change(process.cwd(), options.target, options.env,
