@@ -66,6 +66,7 @@ cli.main(function(args, options) {
       });
     });
   } else if (args[0] === "webserver" || args[0] === "mobile") {
+    options.target = (args[0] === "webserver") ? 'web' : 'mobile';
     mForge.proprieties.change(process.cwd(), options.target, options.env,
       options.rev, options.app, undefined, function() {
         if (options.target === "web") {
