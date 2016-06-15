@@ -13,7 +13,7 @@ current base-ionic-project branch for use this is newMForge .
 Prepare files for deploy, make bundle cummon runs in ci.
 
 ```
-$ m-forge prepare [-m] [-r]
+$ m-forge prepare [-m] [-r]  [-e <environment>]  [-t <target>]
 ```
  - [-e] set the environment of server and app, possibles 'dev' , 'local' , 'production'
  
@@ -29,7 +29,7 @@ $ m-forge prepare [-m] [-r]
 Run a livereload and watch server for development a moblet, and inject the moblet bundle in base-ionic-project and watchs it too.
 
 ```
-$ m-forge moblet <moblet-name> <moblet-project-folder>  [-a <appId>] [-e <environment>]
+$ m-forge moblet <moblet-name> <moblet-project-folder>  [-a <appId>] [-e <environment>] [-t <target>]
 ```
 - [-e] set the environment of server and app, possibles 'dev' , 'local' , 'production'
 
@@ -46,7 +46,7 @@ $ m-forge moblet <moblet-name> <moblet-project-folder>  [-a <appId>] [-e <enviro
 Run a livereload and watch server for development
 
 ```
-$ m-forge develop  [-a <appId>] [-e <environment>]
+$ m-forge develop  [-a <appId>] [-e <environment>]  [-t <target>]
 ```
 - [-t] set the target of build, possibles 'mobile' and 'web'
 
