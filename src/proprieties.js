@@ -40,17 +40,15 @@ var utils = {
    * FOR INDEX.HTML FILE
    */
   changeIndexHtml: function(target, file, dest, dev, callback) {
-    utils.replaceTags(target, file, dest, dev, function() {
-      utils.replaceSrcs(target, file, dest)
-        .on("end", function() {
-          callback();
-        });
-    });
+    utils.replaceSrcs(target, file, dest)
+      .on("end", function() {
+        utils.replaceTags(target, file, dest, dev, callback);
+      });
   },
   replaceTags: function(target, file, dest, dev, callback) {
     var templateWeb;
     var templateMobile;
-    var templateDev = (dev) ? '<script src="bundles/' + dev + '"></script>' : "";
+    var templateD = (dev) ? '<script src="bundles/' + dev + '"></script>' : "";
     utils.loadTemplates(path.join(__dirname, '/templates/mobile.html'),
       function(mobile) {
         templateMobile = mobile;
@@ -61,7 +59,7 @@ var utils = {
             gulp.src(file)
               .pipe(htmlreplace({
                 tags: tempTo,
-                dev: templateDev
+                dev: templateD
               }, {
                 keepBlockTags: true
               }))
