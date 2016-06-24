@@ -54,12 +54,16 @@ var utils = {
         templateMobile = mobile;
         utils.loadTemplates(path.join(__dirname, '/templates/web.html'),
           function(web) {
-            templateWeb = web;
-            var tempTo = (target === "web") ? templateWeb : templateMobile;
-            gulp.src(file)
+            utils.loadTemplates(path.join(__dirname, '/templates/moblets.html'),
+            function(moblets) {
+              templateWeb = web;
+              var mobletsTo = (target === "web") ? moblets : '';
+              var tempTo = (target === "web") ? templateWeb : templateMobile;
+              gulp.src(file)
               .pipe(htmlreplace({
                 tags: tempTo,
-                dev: templateD
+                dev: templateD,
+                moblets: mobletsTo
               }, {
                 keepBlockTags: true
               }))
@@ -70,6 +74,7 @@ var utils = {
               }))
               .pipe(gulp.dest(dest))
               .on('end', callback);
+            });
           });
       });
   },

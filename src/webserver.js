@@ -20,11 +20,36 @@ var utils = {
       }
     });
   },
+  getNewMobletsList: function(appJson) {
+    var pages = appJson.pages;
+    var newMoblets = [];
+    for (var i = 0; i < pages.length; i++) {
+      var moblets = pages[i].moblets;
+      for (var ii = 0; ii < moblets.length; ii++) {
+        var moblet = moblets[ii].type.superClass;
+        if (moblet !== "ulist" &&
+            moblet !== "ugallery" &&
+            moblet !== "umap" &&
+            moblet !== "usimple" &&
+            moblet !== "uframe") {
+          newMoblets.push(utils.bitbucketUrl(moblet));
+        }
+      }
+    }
+    return newMoblets;
+  },
+  bitbucketUrl: function(moblet) {
+    return "https://s3.amazonaws.com/norma-bundle-dev/" + moblet + "/" +
+            moblet + ".bundle.js";
+  },
   jsonParser: function(appJson) {
     var appData = JSON.parse(appJson);
     var info = appData.info || {};
     var style = appData.style || {};
+    var newMoblets = utils.getNewMobletsList(appData);
+    console.log(newMoblets);
     return {
+      moblets: newMoblets || null,
       appId: info.id || null,
       appName: info.name || null,
       icon: info.icon || null,
