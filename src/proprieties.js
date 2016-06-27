@@ -58,10 +58,12 @@ var utils = {
             function(moblets) {
               templateWeb = web;
               var mobletsTo = (target === "web") ? moblets : '';
-              if (target === "mobile" && mobletsList.length > 0) {
-                for (var i = 0; i < mobletsList.length; i++) {
-                  mobletsTo += "<script src='bundles/" + mobletsList[i] +
-                  "'></script>\n";
+              if (typeof mobletsList !== "undefined") {
+                if (target === "mobile" && mobletsList.length > 0) {
+                  for (var i = 0; i < mobletsList.length; i++) {
+                    mobletsTo += "<script src='bundles/" + mobletsList[i] +
+                    "'></script>\n";
+                  }
                 }
               }
               var tempTo = (target === "web") ? templateWeb : templateMobile;
