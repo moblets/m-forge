@@ -39,13 +39,13 @@ var utils = {
   /*
    * FOR INDEX.HTML FILE
    */
-  changeIndexHtml: function(target, file, dest, dev, callback) {
+  changeIndexHtml: function(target, file, dest, dev, callback, mobletsList) {
     utils.replaceSrcs(target, file, dest)
       .on("end", function() {
-        utils.replaceTags(target, file, dest, dev, callback);
+        utils.replaceTags(target, file, dest, dev, callback, mobletsList);
       });
   },
-  replaceTags: function(target, file, dest, dev, callback) {
+  replaceTags: function(target, file, dest, dev, callback, mobletsList) {
     var templateWeb;
     var templateMobile;
     var templateD = (dev) ? '<script src="bundles/' + dev + '"></script>' : "";
@@ -58,6 +58,12 @@ var utils = {
             function(moblets) {
               templateWeb = web;
               var mobletsTo = (target === "web") ? moblets : '';
+              if (target === "mobile" && mobletsList.length > 0) {
+                for (var i = 0; i < mobletsList.length; i++) {
+                  mobletsTo += "<script src='bundles/" + mobletsList[i] +
+                  "'></script>\n";
+                }
+              }
               var tempTo = (target === "web") ? templateWeb : templateMobile;
               gulp.src(file)
               .pipe(htmlreplace({
@@ -150,7 +156,7 @@ var utils = {
 };
 
 var _proprieties = {
-  change: function(location, target, env, rev, id, dev, callback) {
+  change: function(location, target, env, rev, id, dev, callback, moblets) {
     awesome.row();
     awesome.info("changing app properties:");
     awesome.row();
@@ -169,7 +175,7 @@ var _proprieties = {
         function() {
           utils.changeAppJS(env, target, id, targetAppFile, location + "/www/",
             configFile, callback);
-        });
+        }, moblets);
     });
   }
 };

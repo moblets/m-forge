@@ -47,9 +47,9 @@ var utils = {
     var info = appData.info || {};
     var style = appData.style || {};
     var newMoblets = utils.getNewMobletsList(appData);
-    console.log(newMoblets);
     return {
       moblets: newMoblets || null,
+      pushImage: info.push_image || info.icon || null,
       appId: info.id || null,
       appName: info.name || null,
       icon: info.icon || null,
@@ -57,23 +57,30 @@ var utils = {
       color: style.app[0] || null
     };
   },
-  requestAppAndRender: function(url, rev, req, res, requestParam) {
+  requestApp: function(url, appId, callback) {
     request(url, function(error, response, body) {
+      var bodyJson = JSON.parse(body);
       var appData = null;
-      try {
+      if (error || bodyJson.error) {
+        awesome.row();
+        awesome.error("erro requestin app " + appId);
+        awesome.error(error || bodyJson.error.code);
+        awesome.error(error || bodyJson.error.message);
+        awesome.row();
+      } else {
         appData = utils.jsonParser(body);
         awesome.info("app: " + appData.appName + " - " +
                       appData.appId + " requested");
-        if (rev) {
-          res.render('index-rev', appData);
-        } else {
-          res.render('index', appData);
-        }
-      } catch (e) {
-        awesome.row();
-        awesome.error("erro requestin app " + requestParam);
-        awesome.error(e);
-        awesome.row();
+        callback(appData);
+      }
+    });
+  },
+  requestAppAndRender: function(url, rev, req, res, requestParam) {
+    utils.requestApp(url, requestParam, function(appData) {
+      if (rev) {
+        res.render('index-rev', appData);
+      } else {
+        res.render('index', appData);
       }
     });
   }
@@ -119,4 +126,7 @@ var webserver = function(location, port, env, rev) {
   });
 };
 
-module.exports = webserver;
+module.exports = {
+  server: webserver,
+  utils: utils
+};
