@@ -25,6 +25,7 @@ var sass = {
   location: process.cwd() + '/u-base/u-base.scss',
   destination: process.cwd() + "/www/css/"
 };
+var plataformAndroidDir = process.cwd() + "/platforms/android/";
 var pushImageDest = [
   process.cwd() + "/platforms/android/res/drawable-xxxhdpi/push_image.png",
   process.cwd() + "/platforms/android/res/drawable-xxhdpi/push_image.png",
@@ -54,34 +55,39 @@ var download = function(url, dest, cb) {
   });
 };
 var downloadImage = function(url, cb) {
-  try {
-    var file = fs.createWriteStream(pushImageDest[0]);
-    http.get(url, function(response) {
-      response.pipe(file);
-      file.on('finish', function() {
-        file.close(
-        function() {
-          setTimeout(function() {
-            fs.createReadStream(pushImageDest[0])
-            .pipe(fs.createWriteStream(pushImageDest[1]));
-            fs.createReadStream(pushImageDest[0])
-            .pipe(fs.createWriteStream(pushImageDest[2]));
-            fs.createReadStream(pushImageDest[0])
-            .pipe(fs.createWriteStream(pushImageDest[3]));
-            fs.createReadStream(pushImageDest[0])
-            .pipe(fs.createWriteStream(pushImageDest[4]));
-            fs.createReadStream(pushImageDest[0])
-            .pipe(fs.createWriteStream(pushImageDest[5]));
-            awesome
-              .success("🎉 downloaded push icons 🎉");
-            cb();
-          }, 500);
+  fs.exists(plataformAndroidDir, function(exists) {
+    if (exists) {
+      var file = fs.createWriteStream(pushImageDest[0]);
+      http.get(url, function(response) {
+        response.pipe(file);
+        file.on('finish', function() {
+          file.close(
+          function() {
+            setTimeout(function() {
+              fs.createReadStream(pushImageDest[0])
+              .pipe(fs.createWriteStream(pushImageDest[1]));
+              fs.createReadStream(pushImageDest[0])
+              .pipe(fs.createWriteStream(pushImageDest[2]));
+              fs.createReadStream(pushImageDest[0])
+              .pipe(fs.createWriteStream(pushImageDest[3]));
+              fs.createReadStream(pushImageDest[0])
+              .pipe(fs.createWriteStream(pushImageDest[4]));
+              fs.createReadStream(pushImageDest[0])
+              .pipe(fs.createWriteStream(pushImageDest[5]));
+              awesome
+                .success("🎉 downloaded push icons 🎉");
+              cb();
+            }, 500);
+          });
         });
       });
-    });
-  } catch (e) {
-    console.log('this is not a android project, no image for push');
-  }
+    } else {
+      awesome
+        .info('this is not a android project, no image for push');
+      awesome
+          .info('if this is an android project, plz add platform');
+    }
+  });
 };
 var fileName = function(url) {
   var urlArray = url.split("/");
