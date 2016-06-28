@@ -54,29 +54,34 @@ var download = function(url, dest, cb) {
   });
 };
 var downloadImage = function(url, cb) {
-  var file = fs.createWriteStream(pushImageDest[0]);
-  var request = http.get(url, function(response) {
-    response.pipe(file);
-    file.on('finish', function() {
-      file.close(
-      function() {
-        setTimeout(function() {
-          fs.createReadStream(pushImageDest[0])
-          .pipe(fs.createWriteStream(pushImageDest[1]));
-          fs.createReadStream(pushImageDest[0])
-          .pipe(fs.createWriteStream(pushImageDest[2]));
-          fs.createReadStream(pushImageDest[0])
-          .pipe(fs.createWriteStream(pushImageDest[3]));
-          fs.createReadStream(pushImageDest[0])
-          .pipe(fs.createWriteStream(pushImageDest[4]));
-          fs.createReadStream(pushImageDest[0])
-          .pipe(fs.createWriteStream(pushImageDest[5]));
-          awesome
-            .success("🎉 downloaded push icons 🎉");
-        }, 500);
+  try {
+    var file = fs.createWriteStream(pushImageDest[0]);
+    http.get(url, function(response) {
+      response.pipe(file);
+      file.on('finish', function() {
+        file.close(
+        function() {
+          setTimeout(function() {
+            fs.createReadStream(pushImageDest[0])
+            .pipe(fs.createWriteStream(pushImageDest[1]));
+            fs.createReadStream(pushImageDest[0])
+            .pipe(fs.createWriteStream(pushImageDest[2]));
+            fs.createReadStream(pushImageDest[0])
+            .pipe(fs.createWriteStream(pushImageDest[3]));
+            fs.createReadStream(pushImageDest[0])
+            .pipe(fs.createWriteStream(pushImageDest[4]));
+            fs.createReadStream(pushImageDest[0])
+            .pipe(fs.createWriteStream(pushImageDest[5]));
+            awesome
+              .success("🎉 downloaded push icons 🎉");
+            cb();
+          }, 500);
+        });
       });
     });
-  });
+  } catch (e) {
+    console.log('this is not a android project, no image for push');
+  }
 };
 var fileName = function(url) {
   var urlArray = url.split("/");
