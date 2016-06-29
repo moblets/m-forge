@@ -8,6 +8,7 @@ var mustacheExpress = require('mustache-express');
 var request = require('request');
 var awesome = require('awesome-logs');
 var app = express();
+var uniq = require('lodash.uniq');
 
 var utils = {
   loadConfig: function(location, env, callback) {
@@ -36,7 +37,7 @@ var utils = {
         }
       }
     }
-    return newMoblets;
+    return uniq(newMoblets);
   },
   bitbucketUrl: function(moblet) {
     return "https://s3.amazonaws.com/norma-bundle-dev/" + moblet + "/" +
@@ -122,7 +123,9 @@ var webserver = function(location, port, env, rev) {
     });
     app.get('/id/:appId', function(req, res) {
       var url = config + req.params.appId + ".json";
-      utils.requestAppAndRender(url, rev, req, res, req.params.appId);
+      var qs = req.url.split("?")[1];
+      utils.requestAppAndRender(url + "?" + qs, rev, req, res,
+        req.params.appId);
     });
     app.listen(port || 3000, function() {
       awesome.success('preview server running on port: ' + (port || 3000));
