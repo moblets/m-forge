@@ -58,6 +58,7 @@ var utils = {
     };
   },
   requestApp: function(url, appId, callback) {
+    awesome.info("requestiong app: " + appId);
     request(url, function(error, response, body) {
       try {
         var bodyJson = JSON.parse(body);
