@@ -59,19 +59,23 @@ var utils = {
   },
   requestApp: function(url, appId, callback) {
     request(url, function(error, response, body) {
-      var bodyJson = JSON.parse(body);
-      var appData = null;
-      if (error || bodyJson.error) {
-        awesome.row();
-        awesome.error("erro requestin app " + appId);
-        awesome.error(error || bodyJson.error.code);
-        awesome.error(error || bodyJson.error.message);
-        awesome.row();
-      } else {
-        appData = utils.jsonParser(body);
-        awesome.info("app: " + appData.appName + " - " +
-                      appData.appId + " requested");
-        callback(appData);
+      try {
+        var bodyJson = JSON.parse(body);
+        var appData = null;
+        if (error || bodyJson.error) {
+          awesome.row();
+          awesome.error("erro requestin app " + appId);
+          awesome.error(error || bodyJson.error.code);
+          awesome.error(error || bodyJson.error.message);
+          awesome.row();
+        } else {
+          appData = utils.jsonParser(body);
+          awesome.info("app: " + appData.appName + " - " +
+                          appData.appId + " requested");
+          callback(appData);
+        }
+      } catch (e) {
+        console.log(e);
       }
     });
   },
