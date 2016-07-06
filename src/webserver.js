@@ -26,6 +26,9 @@ var utils = {
     var newMoblets = [];
     for (var i = 0; i < pages.length; i++) {
       var moblets = pages[i].moblets;
+      if (typeof pages[i].entries !== "undefined") {
+        moblets = moblets.concat(pages[i].entries);
+      }
       for (var ii = 0; ii < moblets.length; ii++) {
         var moblet = moblets[ii].type.superClass;
         if (moblet !== "ulist" &&
@@ -37,6 +40,7 @@ var utils = {
         }
       }
     }
+    console.log(uniq(newMoblets));
     return uniq(newMoblets);
   },
   bitbucketUrl: function(moblet) {
