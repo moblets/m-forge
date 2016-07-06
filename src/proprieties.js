@@ -12,6 +12,7 @@ var prettify = require('gulp-html-prettify');
 var replace = require('gulp-replace');
 
 var RGX_APPID_DIGIT = /(.constant\('APP_ID',.[^\)]*\))/i;
+var RGX_APPANALYTICS_DIGIT = /(.constant\('APP_ANALYTICS',.[^\)]*\))/i;
 var RGX_APPURL_DIGIT = /(.constant\('API_URL',.[^\)]*\))/i;
 
 var utils = {
@@ -133,7 +134,14 @@ var utils = {
       .on("end", function() {
         utils.replaceIdentifier(target, id, file, dest)
           .on("end", function() {
-            callback();
+            if (target === "mobile") {
+              callback();
+            } else {
+              utils.replaceAnalytics(file, dest, target)
+                .on("end", function() {
+                  callback();
+                });
+            }
           });
       });
   },
@@ -141,6 +149,17 @@ var utils = {
     var regTo = utils.createApiConstant(config.API_URL);
     return gulp.src(file)
       .pipe(replace(RGX_APPURL_DIGIT, regTo))
+      .pipe(gulp.dest(dest));
+  },
+  replaceAnalytics: function(file, dest, target, analytics) {
+    var regTo;
+    if (target === "web") {
+      regTo = ".constant('APP_ANALYTICS', window.appAnalytics)";
+    } else {
+      regTo = ".constant('APP_ANALYTICS', '" + analytics + "')";
+    }
+    return gulp.src(file)
+      .pipe(replace(RGX_APPANALYTICS_DIGIT, regTo))
       .pipe(gulp.dest(dest));
   },
   replaceIdentifier: function(target, id, file, dest) {
@@ -158,6 +177,7 @@ var utils = {
 };
 
 var _proprieties = {
+  replaceAnalytics: utils.replaceAnalytics,
   change: function(location, target, env, rev, id, dev, callback, moblets) {
     awesome.row();
     awesome.info("changing app properties:");

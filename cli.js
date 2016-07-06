@@ -34,6 +34,7 @@ var pushImageDest = [
   process.cwd() + "/platforms/android/res/drawable-mdpi/push_image.png",
   process.cwd() + "/platforms/android/res/drawable-ldpi/push_image.png"
 ];
+
 var js = {
   path: [process.cwd() + '/u-base/**/*',
     process.cwd() + '/www/app.js',
@@ -129,7 +130,7 @@ cli.main(function(args, options) {
       options.rev, options.app, undefined, function() {
         if (options.target === "web") {
           mForge.webserver.server(process.cwd(), options.port, options.env,
-            options.rev);
+            options.rev, options.target);
         }
       });
   } else if (args[0] === "develop") {
@@ -145,54 +146,54 @@ cli.main(function(args, options) {
     mForge.webserver.utils.loadConfig(process.cwd(), options.env,
     function(config) {
       var url = config + options.app + ".json";
-      mForge.webserver.utils.requestApp(url, options.app,
+      mForge.webserver.utils.requestApp(url, options.app, "mobile",
       function(appDef) {
         var asyncFuncs = [];
-
-        var dw = function(moblet) {
-          // console.log(moblet);
-          return function(callback) {
-            download(moblet, js.destination + fileName(moblet), function() {
-              awesome
-              .success("🎉 downloaded moblet " + fileName(moblet) + " 🎉");
-              callback();
-            });
+        mForge.proprieties.replaceAnalytics(js.path[1], process.cwd() + '/www/',
+        "mobile", appDef.appAnalytics).on("end", function() {
+          var dw = function(moblet) {
+            // console.log(moblet);
+            return function(callback) {
+              download(moblet, js.destination + fileName(moblet), function() {
+                awesome
+                .success("🎉 downloaded moblet " + fileName(moblet) + " 🎉");
+                callback();
+              });
+            };
           };
-        };
-        var dwi = function(image) {
-          // console.log(moblet);
-          return function(callback) {
-            downloadImage(image, function() {
-              console.log(image, 'downloaded');
-              callback();
-            });
+          var dwi = function(image) {
+            // console.log(moblet);
+            return function(callback) {
+              downloadImage(image, function() {
+                console.log(image, 'downloaded');
+                callback();
+              });
+            };
           };
-        };
+          var prepare = function(mobletsList) {
+            var ml = [];
+            for (var i = 0; i < mobletsList.length; i++) {
+              ml.push(fileName(mobletsList[i]));
+            }
+            return function(callback) {
+              mForge.proprieties.change(process.cwd(), "mobile", options.env,
+                options.rev, options.app, undefined, callback,
+                ml);
+            };
+          };
+          asyncFuncs.push(prepare(appDef.moblets));
 
-        var prepare = function(mobletsList) {
-          var ml = [];
-          for (var i = 0; i < mobletsList.length; i++) {
-            ml.push(fileName(mobletsList[i]));
+          for (var i = 0; i < appDef.moblets.length; i++) {
+            asyncFuncs.push(dw(appDef.moblets[i]));
           }
-          return function(callback) {
-            mForge.proprieties.change(process.cwd(), "mobile", options.env,
-              options.rev, options.app, undefined, callback,
-              ml);
-          };
-        };
+          if (appDef.pushImage) {
+            asyncFuncs.push(dwi(appDef.pushImage));
+          } else {
+            console.log("no push icon");
+          }
 
-        asyncFuncs.push(prepare(appDef.moblets));
-
-        for (var i = 0; i < appDef.moblets.length; i++) {
-          asyncFuncs.push(dw(appDef.moblets[i]));
-        }
-        if (appDef.pushImage) {
-          asyncFuncs.push(dwi(appDef.pushImage));
-        } else {
-          console.log("no push icon");
-        }
-
-        async.waterfall(asyncFuncs);
+          async.waterfall(asyncFuncs);
+        });
     //     // console.log(appDef.moblets);
       });
     });
