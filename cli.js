@@ -143,7 +143,7 @@ cli.main(function(args, options) {
     mForge.webserver.utils.loadConfig(process.cwd(), options.env,
     function(config) {
       var url = config + options.app + ".json";
-      mForge.webserver.utils.requestApp(url, options.app, "mobile",
+      mForge.webserver.utils.requestApp(url, options.app, "mobile", options.env,
       function(appDef) {
         var asyncFuncs = [];
         mForge.proprieties.replaceAnalytics(js.path[1], process.cwd() + '/www/',

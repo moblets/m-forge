@@ -21,7 +21,7 @@ var utils = {
       }
     });
   },
-  getNewMobletsList: function(appJson) {
+  getNewMobletsList: function(appJson, env) {
     var pages = appJson.pages;
     var newMoblets = [];
     for (var i = 0; i < pages.length; i++) {
@@ -36,22 +36,26 @@ var utils = {
             moblet !== "umap" &&
             moblet !== "usimple" &&
             moblet !== "uframe") {
-          newMoblets.push(utils.bitbucketUrl(moblet));
+          newMoblets.push(utils.bitbucketUrl(moblet, env));
         }
       }
     }
     console.log(uniq(newMoblets));
     return uniq(newMoblets);
   },
-  bitbucketUrl: function(moblet) {
-    return "https://s3.amazonaws.com/norma-bundle-dev/" + moblet + "/" +
+  bitbucketUrl: function(moblet, env) {
+    var envLocation = "norma-bundle-prod";
+    if (env === "dev") {
+      envLocation = "norma-bundle-dev";
+    }
+    return "https://s3.amazonaws.com/" + envLocation + "/" + moblet + "/" +
             moblet + ".bundle.js";
   },
-  jsonParser: function(appJson, target) {
+  jsonParser: function(appJson, target, env) {
     var appData = JSON.parse(appJson);
     var info = appData.info || {};
     var style = appData.style || {};
-    var newMoblets = utils.getNewMobletsList(appData);
+    var newMoblets = utils.getNewMobletsList(appData, env);
     appData.google_analytics_id_web = appData.google_analytics_id_web ||
                                       "UA-30056146-11";
     appData.google_analytics_id_native = appData.google_analytics_id_native ||
@@ -69,7 +73,7 @@ var utils = {
       color: style.app[0] || null
     };
   },
-  requestApp: function(url, appId, target, callback) {
+  requestApp: function(url, appId, target, env, callback) {
     awesome.info("requestiong app: " + appId);
     request(url, function(error, response, body) {
       try {
@@ -82,7 +86,7 @@ var utils = {
           awesome.error(error || bodyJson.error.message);
           awesome.row();
         } else {
-          appData = utils.jsonParser(body, target);
+          appData = utils.jsonParser(body, target, env);
           awesome.info("app: " + appData.appName + " - " +
                           appData.appId + " requested");
           callback(appData);
@@ -92,8 +96,8 @@ var utils = {
       }
     });
   },
-  requestAppAndRender: function(url, rev, req, res, requestParam, target) {
-    utils.requestApp(url, requestParam, target, function(appData) {
+  requestAppAndRender: function(url, rev, req, res, requestParam, target, env) {
+    utils.requestApp(url, requestParam, target, env, function(appData) {
       if (rev) {
         res.render('index-rev', appData);
       } else {
@@ -130,13 +134,14 @@ var webserver = function(location, port, env, rev, target) {
 
     app.get('/:appName', function(req, res) {
       var url = config + "web_mobile/" + req.params.appName + ".json";
-      utils.requestAppAndRender(url, rev, req, res, req.params.appName, target);
+      utils.requestAppAndRender(url, rev, req, res, req.params.appName, target,
+         env);
     });
     app.get('/id/:appId', function(req, res) {
       var url = config + req.params.appId + ".json";
       var qs = req.url.split("?")[1];
       utils.requestAppAndRender(url + "?" + qs, rev, req, res,
-        req.params.appId, target);
+        req.params.appId, target, env);
     });
     app.listen(port || 3000, function() {
       awesome.success('preview server running on port: ' + (port || 3000));
