@@ -37,7 +37,7 @@ var bundler = {
     var deferred = q.defer();
     var mobletName = bundler.bundleName(location);
     var stream = browserify({
-      paths: ['/Users/leo/workspace/fabapp/m-forge/node_modules']
+      paths: ['./node_modules']
     })
       .transform(mobletfy)
       .transform(sassify, {
