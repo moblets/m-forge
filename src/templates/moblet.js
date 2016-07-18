@@ -13,7 +13,7 @@ angular.module("uMoblets")
       $translateProvider.translations(lang, langs[lang]);
     }
   })
-  .directive('<%moblet-title%>', function($uInjector) {
+  .directive('<%moblet-title%>', function($mInjector) {
     return {
       restrict: 'E',
       template: fs.readFileSync(path.join(__dirname, '<%moblet-template%>'), 'utf8'),

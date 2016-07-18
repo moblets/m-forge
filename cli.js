@@ -19,10 +19,9 @@ cli.parse({
   target: ['t', 'target', 'string', "web"]
 });
 var sass = {
-  path: [process.cwd() + '/u-base/**/*.scss',
-    process.cwd() + '/u-core/**/*.scss',
+  path: [process.cwd() + '/m-base/**/*.scss',
     process.cwd() + '/u-moblets/**/*.scss'],
-  location: process.cwd() + '/u-base/u-base.scss',
+  location: process.cwd() + '/m-base/m-base.scss',
   destination: process.cwd() + "/www/css/"
 };
 var plataformAndroidDir = process.cwd() + "/platforms/android/";
@@ -36,14 +35,12 @@ var pushImageDest = [
 ];
 
 var js = {
-  path: [process.cwd() + '/u-base/**/*',
+  path: [process.cwd() + '/m-base/**/*',
     process.cwd() + '/www/app.js',
     process.cwd() + '/www/index.html',
-    process.cwd() + '/u-core/**/*',
     process.cwd() + '/u-moblets/**/*'],
   location: [process.cwd() + "/u-moblets/u-moblets.js",
-    process.cwd() + "/u-core/u-core.js",
-    process.cwd() + "/u-base/u-base.js"],
+    process.cwd() + "/m-base/m-base.js"],
   destination: process.cwd() + "/www/bundles/"
 };
 var download = function(url, dest, cb) {
