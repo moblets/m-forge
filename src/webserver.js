@@ -48,7 +48,6 @@ var utils = {
     if (env === "dev") {
       envLocation = "norma-bundle-dev";
     }
-    console.log("---------------", envLocation);
     return "https://s3.amazonaws.com/" + envLocation + "/" + moblet + "/" +
             moblet + ".bundle.js";
   },

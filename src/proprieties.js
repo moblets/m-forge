@@ -14,10 +14,14 @@ var replace = require('gulp-replace');
 var RGX_APPID_DIGIT = /(.constant\('APP_ID',.[^\)]*\))/i;
 var RGX_APPANALYTICS_DIGIT = /(.constant\('APP_ANALYTICS',.[^\)]*\))/i;
 var RGX_APPURL_DIGIT = /(.constant\('API_URL',.[^\)]*\))/i;
+var RGX_NAUVAURL_DIGIT = /(.constant\('NAUVA_URL',.[^\)]*\))/i;
 
 var utils = {
   createApiConstant: function(server) {
     return ".constant('API_URL','" + server + "')";
+  },
+  createNauvaConstant: function(server) {
+    return ".constant('NAUVA_URL','" + server + "')";
   },
   loadConfig: function(configUrl, callback) {
     require('fs').readFile(configUrl, 'utf8', function(err, data) {
@@ -147,8 +151,10 @@ var utils = {
   },
   replaceEnvs: function(env, file, dest, config) {
     var regTo = utils.createApiConstant(config.API_URL);
+    var regNauvaTo = utils.createNauvaConstant(config.NAUVA_URL);
     return gulp.src(file)
       .pipe(replace(RGX_APPURL_DIGIT, regTo))
+      .pipe(replace(RGX_NAUVAURL_DIGIT, regNauvaTo))
       .pipe(gulp.dest(dest));
   },
   replaceAnalytics: function(file, dest, target, analytics) {
