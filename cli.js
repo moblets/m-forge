@@ -105,49 +105,50 @@ var routines = {
             callback();
           });
       });
-  }
-};
-
-cli.main(function(args, options) {
-  var action = args[0];
-  awesome.row();
-  awesome.info("starting " + action + " build");
-  awesome.row();
-  if (action === "prepare") {
+  },
+  prepare: function(args, options) {
     routines.resources(args, options, function() {
-      mForge.proprieties.change(process.cwd(), options.target, options.env,
-      options.rev, options.app, undefined, function() {
-        awesome
-          .success("🎉 Bundles and Sass successfully compiled 🎉");
+      mForge.proprieties.change(process.cwd(), options, function() {
+        awesome.success("🎉 Action Prepare successfully completed 🎉");
       });
     });
-  } else if (args[0] === "webserver") {
-    options.target = (args[0] === "webserver") ? 'web' : 'mobile';
-    mForge.proprieties.change(process.cwd(), options.target, options.env,
-      options.rev, options.app, undefined, function() {
-        if (options.target === "web") {
-          mForge.webserver.server(process.cwd(), options.port, options.env,
-            options.rev, options.target);
-        }
-      });
-  } else if (args[0] === "develop") {
+  },
+  develop: function(args, options) {
     routines.resources(args, options, function() {
-      awesome
-        .success("🎉 Bundles and Sass successfully compiled 🎉");
-      mForge.proprieties.change(process.cwd(), "mobile", options.env,
-        options.rev, options.app, undefined, function() {
-          mForge.develop.start(sass, js, location);
-        });
+      mForge.proprieties.change(process.cwd(), options, function() {
+        mForge.develop.start(sass, js, process.cwd() + "www/");
+      });
     });
-  } else if (args[0] === "mobile") {
+  },
+  moblet: function(args, options) {
+    js.path.push(args[2] + "/moblet/**/*");
+    js.location.push(args[2] + "/moblet/" + args[1] + ".js");
+    routines.resources(args, options, function() {
+      options.dev = args[1] + ".bundle.js";
+      mForge.proprieties.change(process.cwd(), options, function() {
+        mForge.develop.start(sass, js, process.cwd() + "www/");
+      });
+    });
+  },
+  webserver: function(args, options) {
+    options.target = 'web';
+    mForge.proprieties.change(process.cwd(), options, function() {
+      mForge.webserver.server(process.cwd(), options.port, options.env,
+        options.rev, options.target);
+    });
+  },
+  mobile: function(args, options) {
     mForge.webserver.utils.loadConfig(process.cwd(), options.env,
-    function(config) {
-      var url = config + options.app + ".json";
-      mForge.webserver.utils.requestApp(url, options.app, "mobile", options.env,
-      function(appDef) {
-        var asyncFuncs = [];
-        mForge.proprieties.replaceAnalytics(js.path[1], process.cwd() + '/www/',
-        "mobile", appDef.appAnalytics).on("end", function() {
+      function(config) {
+        var url = config + options.app + ".json";
+        mForge.webserver.utils.requestApp(url, options.app, "mobile", options.env,
+        function(appDef) {
+          var asyncFuncs = [];
+          options.analytics = appDef.appAnalytics;
+          options.facebookId = appDef.facebookId || "FACEBOOKID";
+          // -------------------------------------------------------
+          // SUPPORT FUNCTIONS
+          // -------------------------------------------------------
           var dw = function(moblet) {
             // console.log(moblet);
             return function(callback) {
@@ -172,12 +173,15 @@ cli.main(function(args, options) {
             for (var i = 0; i < mobletsList.length; i++) {
               ml.push(fileName(mobletsList[i]));
             }
+            options.moblets = ml;
             return function(callback) {
-              mForge.proprieties.change(process.cwd(), "mobile", options.env,
-                options.rev, options.app, undefined, callback,
-                ml);
+              mForge.proprieties.change(process.cwd(), options, callback);
             };
           };
+          // -------------------------------------------------------
+          // END OF SUPPORT FUNCTIONS
+          // -------------------------------------------------------
+
           asyncFuncs.push(prepare(appDef.moblets));
 
           for (var i = 0; i < appDef.moblets.length; i++) {
@@ -191,21 +195,27 @@ cli.main(function(args, options) {
 
           async.waterfall(asyncFuncs);
         });
-    //     // console.log(appDef.moblets);
       });
-    });
-  } else if (args[0] === "moblet") {
-    js.path.push(args[2] + "/moblet/**/*");
-    js.location.push(args[2] + "/moblet/" + args[1] + ".js");
-    routines.resources(args, options, function() {
-      awesome
-        .success("🎉 Bundles and Sass successfully compiled 🎉");
-      mForge.proprieties.change(process.cwd(), "mobile", options.env,
-        options.rev, options.app, args[1] + ".bundle.js", function() {
-          mForge.develop.start(sass, js, location);
-        });
-    });
   }
+};
+
+cli.main(function(args, options) {
+  var action = args[0];
+  awesome.row();
+  awesome.info("starting " + action + " build");
+  awesome.row();
+  options.id = options.app;
+  routines[args[0]](args, options);
+  // change: function(project, options, moblets, callback) {
+  // var options = {
+  //   id: "",
+  //   target: "",
+  //   env: "",
+  //   rev: "",
+  //   dev: "",
+  //   analytics: "",
+  //   facebookId: ""
+  // };
 });
 
 cli.enable('help');

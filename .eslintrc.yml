@@ -1,1 +1,27 @@
 extends: google
+rules:
+  require-jsdoc: 0
+  no-warning-comments: 0
+  camelcase: "off"
+  max-len: [2,{"code":120}]
+globals:
+  _: true
+  ionic: true
+  google: true
+  cordova: true
+  isNull: true
+  navigator: true
+  document: true
+  angular: true
+  analytics: true
+  window: true
+  mBase: true
+  uMoblets: true
+  extend: true
+  forEach: true
+  isDefined: true
+  isNumber: true
+  isString: true
+  jqLite: true
+  noop: true
+  PushNotification: true
