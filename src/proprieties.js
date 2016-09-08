@@ -18,8 +18,14 @@ var RGX_APPURL = /(.constant\('API_URL',.[^\)]*\))/i;
 var RGX_NAUVAURL = /(.constant\('NAUVA_URL',.[^\)]*\))/i;
 
 var proprieties = {
-  createConstant: function(constant, value) {
-    return ".constant('" + constant + "','" + value + "')";
+  createConstant: function(constant, value, target) {
+    var cons = "";
+    if (target === "web") {
+      cons = ".constant('" + constant + "'," + value + ")";
+    } else {
+      cons = ".constant('" + constant + "','" + value + "')";
+    }
+    return cons;
   },
   loadConfig: function(configUrl, callback) {
     require('fs').readFile(configUrl, 'utf8', function(err, data) {
@@ -56,12 +62,12 @@ var proprieties = {
       .pipe(gulp.dest(dest))
       .on("end", callback);
     },
-    identifies: function(file, data, callback) {
+    identifies: function(file, data, target, callback) {
       var dest = utils.destination(file);
       gulp.src(file)
-      .pipe(replace(RGX_APPID, proprieties.createConstant('APP_ID', data.APP_ID)))
-      .pipe(replace(RGX_APPANALYTICS, proprieties.createConstant('APP_ANALYTICS', data.APP_ANALYTICS)))
-      .pipe(replace(RGX_FACEBOOKAPI, proprieties.createConstant('FACEBOOK_APP_ID', data.FACEBOOK_APP_ID)))
+      .pipe(replace(RGX_APPID, proprieties.createConstant('APP_ID', data.APP_ID, target)))
+      .pipe(replace(RGX_APPANALYTICS, proprieties.createConstant('APP_ANALYTICS', data.APP_ANALYTICS, target)))
+      .pipe(replace(RGX_FACEBOOKAPI, proprieties.createConstant('FACEBOOK_APP_ID', data.FACEBOOK_APP_ID, target)))
       .pipe(gulp.dest(dest))
       .on("end", callback);
     },
@@ -69,21 +75,25 @@ var proprieties = {
       var dest = utils.destination(file);
       var templateD = (dev) ? '<script src="bundles/' + dev + '"></script>' : "";
       proprieties.loadTemplates(function(templates) {
-        var mobletsTo = (target === "web") ? templates.moblets : '';
+        var replaces = {
+          dev: templateD,
+          moblets: ""
+        };
+
+        replaces.moblets = (target === "web") ? templates.moblets : '';
+
         if (typeof moblets !== "undefined") {
           if (target === "mobile" && moblets.length > 0) {
             for (var i = 0; i < moblets.length; i++) {
-              mobletsTo += "<script src='bundles/" + moblets[i] + "'></script>\n";
+              replaces.moblets += "<script src='bundles/" + moblets[i] + "'></script>\n";
             }
           }
         }
-        var tempTo = (target === "web") ? templates.web : templates.mobile;
+
+        replaces.tags = (target === "web") ? templates.web : templates.mobile;
+
         gulp.src(file)
-        .pipe(htmlreplace({
-          tags: tempTo,
-          dev: templateD,
-          moblets: mobletsTo
-        }, {
+        .pipe(htmlreplace(replaces, {
           keepBlockTags: true
         }))
         /* eslint camelcase: 0 */
@@ -96,9 +106,9 @@ var proprieties = {
       });
     },
     srcs: function(target, file, callback) {
-      var REGEX_SRC_WEB = /(src="\/)(?!https:\/\/)(?!http:\/\/)(.*)/ig;
+      var REGEX_SRC_WEB = /(src="\/static\/)(?!https:\/\/)(?!http:\/\/)(.*)/ig;
       var REGEX_SRC_MOBILE = /(src=")(?!\/)(?!https:\/\/)(?!http:\/\/)(.*)/ig;
-      var REGEX_HREF_WEB = /(href="\/)(?!https:\/\/)(?!http:\/\/)(.*)/ig;
+      var REGEX_HREF_WEB = /(href="\/static\/)(?!https:\/\/)(?!http:\/\/)(.*)/ig;
       var REGEX_HREF_MOBILE = /(href=")(?!\/)(?!https:\/\/)(?!http:\/\/)(.*)/ig;
       var dest = utils.destination(file);
       var regSrcFrom;
@@ -108,8 +118,8 @@ var proprieties = {
       if (target === "web") {
         regSrcFrom = REGEX_SRC_MOBILE;
         regHrefFrom = REGEX_HREF_MOBILE;
-        regSrcTo = "src=\"/$2";
-        regHrefTo = "href=\"/$2";
+        regSrcTo = "src=\"/static/$2";
+        regHrefTo = "href=\"/static/$2";
       } else {
         regSrcFrom = REGEX_SRC_WEB;
         regHrefFrom = REGEX_HREF_WEB;
@@ -143,16 +153,17 @@ var _proprieties = {
       var configFile = JSON.parse(data);
       var targetAppFile = project + '/www/app.js';
       var targetIndexFile = (options.rev) ? project + '/www/index-rev.html' : project + '/www/index.html';
+
       var identifies = {
-        APP_ID: options.id,
-        APP_ANALYTICS: options.analytics,
-        FACEBOOK_APP_ID: options.facebookId
+        APP_ID: (options.target === 'web') ? "window.appId" : options.id,
+        APP_ANALYTICS: (options.target === 'web') ? "window.appAnalytics" : options.analytics,
+        FACEBOOK_APP_ID: (options.target === 'web') ? "window.facebookAppId" : options.facebookId
       };
 
-      proprieties.change.tags(options.target, targetIndexFile, options.dev, options.moblets, function() {
-        proprieties.change.srcs(options.target, targetIndexFile, function() {
+      proprieties.change.srcs(options.target, targetIndexFile, function() {
+        proprieties.change.tags(options.target, targetIndexFile, options.dev, options.moblets, function() {
           proprieties.change.envs(targetAppFile, configFile, function() {
-            proprieties.change.identifies(targetAppFile, identifies, function() {
+            proprieties.change.identifies(targetAppFile, identifies, options.target, function() {
               if (typeof callback === "function") {
                 callback();
               }

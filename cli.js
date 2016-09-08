@@ -5,6 +5,7 @@ var awesome = require('awesome-logs');
 var https = require('https');
 var http = require('http');
 var fs = require('fs.extra');
+var merge = require('lodash.merge');
 var async = require('async');
 /**
  * mForge CLI
@@ -16,6 +17,7 @@ cli.parse({
   rev: ['r', 'revision', 'boolean', false],
   min: ['m', 'minify', 'boolean', false],
   app: ['a', 'app', 'number', 1294524],
+  version: ['v', 'version', 'boolean', false],
   target: ['t', 'target', 'string', "web"]
 });
 var sass = {
@@ -114,27 +116,40 @@ var routines = {
     });
   },
   develop: function(args, options) {
-    routines.resources(args, options, function() {
-      mForge.proprieties.change(process.cwd(), options, function() {
-        mForge.develop.start(sass, js, process.cwd() + "www/");
+    // subs options
+    options.target = "mobile";
+    // excs action
+    mForge.utils.appDef(process.cwd(), options, function(config) {
+      options = merge(options, config);
+      routines.resources(args, options, function() {
+        mForge.proprieties.change(process.cwd(), options, function() {
+          mForge.develop.start(sass, js, process.cwd() + "/www/");
+        });
       });
     });
   },
   moblet: function(args, options) {
     js.path.push(args[2] + "/moblet/**/*");
     js.location.push(args[2] + "/moblet/" + args[1] + ".js");
-    routines.resources(args, options, function() {
-      options.dev = args[1] + ".bundle.js";
-      mForge.proprieties.change(process.cwd(), options, function() {
-        mForge.develop.start(sass, js, process.cwd() + "www/");
+    // excs action
+    mForge.utils.appDef(process.cwd(), options.app, options.env, function(config) {
+      options.analytics = config.google_analytics_id_web;
+      options.facebookId = config.info.facebook_app_id || "MOCKDATATESDSD";
+      console.log(options);
+      routines.resources(args, options, function() {
+        options.dev = args[1] + ".bundle.js";
+        mForge.proprieties.change(process.cwd(), options, function() {
+          mForge.develop.start(sass, js, process.cwd() + "www/");
+        });
       });
     });
   },
   webserver: function(args, options) {
+    // subs options
     options.target = 'web';
+    // subs options
     mForge.proprieties.change(process.cwd(), options, function() {
-      mForge.webserver.server(process.cwd(), options.port, options.env,
-        options.rev, options.target);
+      mForge.webserver.server(process.cwd(), options);
     });
   },
   mobile: function(args, options) {
@@ -145,7 +160,8 @@ var routines = {
         function(appDef) {
           var asyncFuncs = [];
           options.analytics = appDef.appAnalytics;
-          options.facebookId = appDef.facebookId || "FACEBOOKID";
+          options.facebookAppId = appDef.facebookAppId || "FACEBOOKID";
+          options.facebookAppName = appDef.facebookAppName || "FACEBOOKIDNAME";
           // -------------------------------------------------------
           // SUPPORT FUNCTIONS
           // -------------------------------------------------------
@@ -201,21 +217,17 @@ var routines = {
 
 cli.main(function(args, options) {
   var action = args[0];
-  awesome.row();
-  awesome.info("starting " + action + " build");
-  awesome.row();
-  options.id = options.app;
-  routines[args[0]](args, options);
-  // change: function(project, options, moblets, callback) {
-  // var options = {
-  //   id: "",
-  //   target: "",
-  //   env: "",
-  //   rev: "",
-  //   dev: "",
-  //   analytics: "",
-  //   facebookId: ""
-  // };
+  if (options.version) {
+    awesome.row();
+    awesome.info("version: v2-beta");
+    awesome.row();
+  } else {
+    awesome.row();
+    awesome.info("starting " + action + " build");
+    awesome.row();
+    options.id = options.app;
+    routines[args[0]](args, options);
+  }
 });
 
 cli.enable('help');
