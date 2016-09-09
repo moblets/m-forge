@@ -2,9 +2,6 @@
 var mForge = require('./m-forge.js');
 var cli = require('cli');
 var awesome = require('awesome-logs');
-var https = require('https');
-var http = require('http');
-var fs = require('fs.extra');
 var merge = require('lodash.merge');
 var async = require('async');
 /**
@@ -99,7 +96,7 @@ var routines = {
   webserver: function(args, options) {
     // subs options
     options.target = 'web';
-    // subs options
+    // excs action
     mForge.proprieties.change(process.cwd(), options, function() {
       mForge.webserver.server(process.cwd(), options);
     });
@@ -107,7 +104,7 @@ var routines = {
   mobile: function(args, options) {
     // subs options
     options.target = 'mobile';
-    // subs options
+    // excs action
     mForge.utils.appDef(process.cwd(), options, function(config) {
       options = merge(options, config);
       var asyncFuncs = [];
@@ -144,16 +141,15 @@ var routines = {
     });
   },
   moblet: function(args, options) {
-    // TODO: ARRUAR ESSA TRETA
     js.path.push(args[2] + "/moblet/**/*");
     js.location.push(args[2] + "/moblet/" + args[1] + ".js");
+    // subs options
+    options.target = 'mobile';
     // excs action
     mForge.utils.appDef(process.cwd(), options, function(config) {
-      // options.analytics = config.google_analytics_id_web;
-      // options.facebookId = config.info.facebook_app_id || "MOCKDATATESDSD";
       options = merge(options, config);
       routines.resources(args, options, function() {
-        options.dev = args[1] + ".bundle.js";
+        options.moblets.push(args[2] + "/moblet/" + args[1] + ".js");
         mForge.proprieties.change(process.cwd(), options, function() {
           mForge.develop.start(sass, js, process.cwd() + "www/");
         });

@@ -8,7 +8,7 @@ var browserify = require('browserify');
 var brfs = require('brfs');
 var rename = require('gulp-rename');
 var sass = require('gulp-sass');
-var buffer = require('gulp-buffer');
+var utils = require('./utils.js');
 var sassify = require('sassify');
 var stripDebug = require('gulp-strip-debug');
 var strip = require('gulp-strip-comments');
@@ -86,38 +86,37 @@ var bundler = {
     var deferred = q.defer();
     var promises = [];
     awesome.row();
-    awesome.info("building bundles for for: ");
-    awesome.row();
+    awesome.info("building bundles: ");
     if (typeof location === "string") {
-      awesome.info("‣ " + location);
+      awesome.info("✅  " + utils.fileName(location));
       promises.push(bundler.build(location, destination, min, rev));
     } else {
       for (var i = 0; i < location.length; i++) {
-        awesome.info("‣ " + location[i]);
+        awesome.info("✅  " + utils.fileName(location[i]));
         promises.push(bundler.build(location[i], destination, min, rev));
       }
     }
+    awesome.row();
     q.all(promises).then(function() {
       deferred.resolve();
     });
     return deferred.promise;
   },
-  sass: function(location, destination, min) {
+  sass: function(location, destination) {
     if (typeof location === "string") {
       location = [location];
     }
     awesome.row();
     awesome.info("building sass for for: ");
-    awesome.row();
     for (var i = 0; i < location.length; i++) {
-      console.log("‣" + location[i]);
+      awesome.info("✅  " + utils.fileName(location[i]).replace('js', 'scss'));
     }
-    awesome.row();
+
     var stream = gulp.src(location)
       .pipe(sass())
       .on('error', sass.logError)
       .pipe(gulp.dest(destination));
-
+    awesome.row();
     stream
       .pipe(minifyCss({
         keepSpecialComments: 0
