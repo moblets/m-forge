@@ -2,12 +2,28 @@ var fs = require('fs');
 var awesome = require('awesome-logs');
 var request = require('request');
 var uniq = require('lodash.uniq');
+var https = require('https');
+var http = require('http');
 
 var utils = {
   destination: function(file) {
     var pathSplit = file.split("/");
     var fileName = pathSplit[pathSplit.length - 1];
     return file.replace(fileName, "");
+  },
+  fileName: function(url) {
+    var urlArray = url.split("/");
+    return urlArray[urlArray.length - 1].split(".")[0] + ".js";
+  },
+  download: function(url, dest, cb) {
+    var file = fs.createWriteStream(dest);
+    https.get(url, function(response) {
+      response.pipe(file);
+      file.on('finish', function() {
+        awesome.success("⏬  downloaded file : " + utils.fileName(url));
+        file.close(cb);  // close() is async, call cb after close completes.
+      });
+    });
   },
   config: function(location, options, callback) {
     var config = location + "/env." + options.env + ".json";
@@ -25,7 +41,7 @@ var utils = {
       if (options.fromName) {
         url = config.API_URL + "web_mobile/" + options.name + ".json";
       } else {
-        url = config.API_URL + options.app + ".json";
+        url = config.API_URL + options.appId + ".json";
       }
 
       request(url, function(error, response, body) {
@@ -33,20 +49,20 @@ var utils = {
           var bodyJson = JSON.parse(body);
           if (error || bodyJson.error) {
             awesome.row();
-            awesome.error("erro requestin app " + options.app);
+            awesome.error("erro requestin app " + options.appId);
             awesome.error(error || bodyJson.error.code);
             awesome.error(error || bodyJson.error.message);
             awesome.row();
           } else {
             var info = bodyJson.info || {};
             var style = bodyJson.style || {};
-            var newMoblets = utils.moblets.list(bodyJson, options.env);
+            var newMoblets = utils.moblets.list(bodyJson, options);
             bodyJson.google_analytics_id_web = bodyJson.google_analytics_id_web || "UA-30056146-11";
             bodyJson.google_analytics_id_native = bodyJson.google_analytics_id_native || "UA-30056146-7";
             var analyticsKey = (options.target === "web") ? bodyJson.google_analytics_id_web :
                                                             bodyJson.google_analytics_id_native;
 
-            var response = {
+            var object = {
               moblets: newMoblets || null,
               pushImage: info.push_image || info.icon || null,
               appAnalytics: analyticsKey,
@@ -58,7 +74,7 @@ var utils = {
               splash: info.splash || null,
               color: style.app[0] || null
             };
-            callback(response);
+            callback(object);
           }
         } catch (e) {
           console.log(e);
@@ -66,8 +82,56 @@ var utils = {
       });
     });
   },
+  images: {
+    download: function(location, url) {
+      return function(cb) {
+        var plataformAndroidDir = location + "/platforms/android/";
+        var pushImageDest = [
+          location + "/platforms/android/res/drawable-xxxhdpi/push_image.png",
+          location + "/platforms/android/res/drawable-xxhdpi/push_image.png",
+          location + "/platforms/android/res/drawable-xhdpi/push_image.png",
+          location + "/platforms/android/res/drawable-hdpi/push_image.png",
+          location + "/platforms/android/res/drawable-mdpi/push_image.png",
+          location + "/platforms/android/res/drawable-ldpi/push_image.png"
+        ];
+
+        fs.exists(plataformAndroidDir, function(exists) {
+          if (exists) {
+            var file = fs.createWriteStream(pushImageDest[0]);
+            http.get(url, function(response) {
+              response.pipe(file);
+              file.on('finish', function() {
+                file.close(
+                 function() {
+                   setTimeout(function() {
+                     fs.createReadStream(pushImageDest[0])
+                     .pipe(fs.createWriteStream(pushImageDest[1]));
+                     fs.createReadStream(pushImageDest[0])
+                     .pipe(fs.createWriteStream(pushImageDest[2]));
+                     fs.createReadStream(pushImageDest[0])
+                     .pipe(fs.createWriteStream(pushImageDest[3]));
+                     fs.createReadStream(pushImageDest[0])
+                     .pipe(fs.createWriteStream(pushImageDest[4]));
+                     fs.createReadStream(pushImageDest[0])
+                     .pipe(fs.createWriteStream(pushImageDest[5]));
+                   }, 500);
+                 });
+              });
+            });
+          } else {
+            awesome
+               .info('this is not a android project, no image for push');
+            awesome
+                 .info('if this is an android project, plz add platform');
+          }
+        });
+        awesome.success("⏬  downloaded file : push_image.png");
+        cb();
+      };
+    }
+  },
   moblets: {
-    list: function(appDef, env) {
+    list: function(appDef, options) {
       var pages = appDef.pages;
       var newMoblets = [];
       for (var i = 0; i < pages.length; i++) {
@@ -82,19 +146,30 @@ var utils = {
               moblet !== "umap" &&
               moblet !== "usimple" &&
               moblet !== "uframe") {
-            newMoblets.push(utils.moblets.bitbucketUrl(moblet, env));
+            newMoblets.push(utils.moblets.bitbucketUrl(moblet, options));
           }
         }
       }
       return uniq(newMoblets);
     },
-    bitbucketUrl: function(moblet, env) {
+    download: function(location, url) {
+      return function(callback) {
+        utils.download(url, location + "/www/bundles/" + utils.fileName(url), function() {
+          callback();
+        });
+      };
+    },
+    bitbucketUrl: function(moblet, options) {
+      var url;
+
       var envLocation = "norma-bundle-prod";
-      if (env === "dev") {
+      if (options.env === "dev") {
         envLocation = "norma-bundle-dev";
       }
-      return "https://s3.amazonaws.com/" + envLocation + "/" + moblet + "/" +
-                moblet + ".bundle.js";
+      url = "https://s3.amazonaws.com/" + envLocation + "/" + moblet + "/" +
+                  moblet + ".bundle.js";
+
+      return url;
     }
   },
   loadTemplate: function(template, callback) {

@@ -11,7 +11,7 @@ var utils = require('./utils.js');
 
 var requestAppAndRender = function(location, options, res, name, app) {
   if (typeof name === "undefined") {
-    options.app = app;
+    options.appId = app;
   } else {
     options.fromName = true;
     options.name = name;

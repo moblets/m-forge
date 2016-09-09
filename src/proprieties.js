@@ -155,11 +155,10 @@ var _proprieties = {
       var targetIndexFile = (options.rev) ? project + '/www/index-rev.html' : project + '/www/index.html';
 
       var identifies = {
-        APP_ID: (options.target === 'web') ? "window.appId" : options.id,
-        APP_ANALYTICS: (options.target === 'web') ? "window.appAnalytics" : options.analytics,
-        FACEBOOK_APP_ID: (options.target === 'web') ? "window.facebookAppId" : options.facebookId
+        APP_ID: (options.target === 'web') ? "window.appId" : options.appId,
+        APP_ANALYTICS: (options.target === 'web') ? "window.appAnalytics" : options.appAnalytics,
+        FACEBOOK_APP_ID: (options.target === 'web') ? "window.facebookAppId" : options.facebookAppId
       };
-
       proprieties.change.srcs(options.target, targetIndexFile, function() {
         proprieties.change.tags(options.target, targetIndexFile, options.dev, options.moblets, function() {
           proprieties.change.envs(targetAppFile, configFile, function() {

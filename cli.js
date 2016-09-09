@@ -16,7 +16,7 @@ cli.parse({
   env: ['e', 'environment', 'string', "dev"],
   rev: ['r', 'revision', 'boolean', false],
   min: ['m', 'minify', 'boolean', false],
-  app: ['a', 'app', 'number', 1294524],
+  appId: ['a', 'app', 'number', 1294524],
   version: ['v', 'version', 'boolean', false],
   target: ['t', 'target', 'string', "web"]
 });
@@ -26,15 +26,6 @@ var sass = {
   location: process.cwd() + '/m-base/m-base.scss',
   destination: process.cwd() + "/www/css/"
 };
-var plataformAndroidDir = process.cwd() + "/platforms/android/";
-var pushImageDest = [
-  process.cwd() + "/platforms/android/res/drawable-xxxhdpi/push_image.png",
-  process.cwd() + "/platforms/android/res/drawable-xxhdpi/push_image.png",
-  process.cwd() + "/platforms/android/res/drawable-xhdpi/push_image.png",
-  process.cwd() + "/platforms/android/res/drawable-hdpi/push_image.png",
-  process.cwd() + "/platforms/android/res/drawable-mdpi/push_image.png",
-  process.cwd() + "/platforms/android/res/drawable-ldpi/push_image.png"
-];
 
 var js = {
   path: [process.cwd() + '/m-base/**/*',
@@ -45,54 +36,7 @@ var js = {
     process.cwd() + "/m-base/m-base.js"],
   destination: process.cwd() + "/www/bundles/"
 };
-var download = function(url, dest, cb) {
-  var file = fs.createWriteStream(dest);
-  var request = https.get(url, function(response) {
-    response.pipe(file);
-    file.on('finish', function() {
-      file.close(cb);  // close() is async, call cb after close completes.
-    });
-  });
-};
-var downloadImage = function(url, cb) {
-  fs.exists(plataformAndroidDir, function(exists) {
-    if (exists) {
-      var file = fs.createWriteStream(pushImageDest[0]);
-      http.get(url, function(response) {
-        response.pipe(file);
-        file.on('finish', function() {
-          file.close(
-          function() {
-            setTimeout(function() {
-              fs.createReadStream(pushImageDest[0])
-              .pipe(fs.createWriteStream(pushImageDest[1]));
-              fs.createReadStream(pushImageDest[0])
-              .pipe(fs.createWriteStream(pushImageDest[2]));
-              fs.createReadStream(pushImageDest[0])
-              .pipe(fs.createWriteStream(pushImageDest[3]));
-              fs.createReadStream(pushImageDest[0])
-              .pipe(fs.createWriteStream(pushImageDest[4]));
-              fs.createReadStream(pushImageDest[0])
-              .pipe(fs.createWriteStream(pushImageDest[5]));
-              awesome
-                .success("🎉 downloaded push icons 🎉");
-              cb();
-            }, 500);
-          });
-        });
-      });
-    } else {
-      awesome
-        .info('this is not a android project, no image for push');
-      awesome
-          .info('if this is an android project, plz add platform');
-    }
-  });
-};
-var fileName = function(url) {
-  var urlArray = url.split("/");
-  return urlArray[urlArray.length - 1].split(".")[0] + ".js";
-};
+
 var location = process.cwd() + "/www/";
 var destination = process.cwd() + "/www/bundles/";
 var manifest = process.cwd() + "/www/bundles/rev-manifest.json";
@@ -121,27 +65,35 @@ var routines = {
     // excs action
     mForge.utils.appDef(process.cwd(), options, function(config) {
       options = merge(options, config);
-      routines.resources(args, options, function() {
-        mForge.proprieties.change(process.cwd(), options, function() {
+      var asyncFuncs = [];
+      // add moblet injection to functions array
+      asyncFuncs.push(function(callback) {
+        var ml = [];
+        for (var i = 0; i < config.moblets.length; i++) {
+          ml.push(mForge.utils.fileName(config.moblets[i]));
+        }
+        options.moblets = ml;
+        mForge.proprieties.change(process.cwd(), options, callback);
+      });
+      // add download moblets to functions array
+      if (config.moblets.length > 0) {
+        for (var i = 0; i < config.moblets.length; i++) {
+          asyncFuncs.push(mForge.utils.moblets.download(process.cwd(), config.moblets[i]));
+        }
+      } else {
+        console.log("no new moblets");
+      }
+      awesome.row();
+      awesome.info("executing now " + asyncFuncs.length + " async functions");
+      awesome.row();
+      asyncFuncs.push(function() {
+        awesome.success("✅  waterfall async functions done");
+        awesome.success("🌐  now starting develop auto reload server");
+        routines.resources(args, options, function() {
           mForge.develop.start(sass, js, process.cwd() + "/www/");
         });
       });
-    });
-  },
-  moblet: function(args, options) {
-    js.path.push(args[2] + "/moblet/**/*");
-    js.location.push(args[2] + "/moblet/" + args[1] + ".js");
-    // excs action
-    mForge.utils.appDef(process.cwd(), options.app, options.env, function(config) {
-      options.analytics = config.google_analytics_id_web;
-      options.facebookId = config.info.facebook_app_id || "MOCKDATATESDSD";
-      console.log(options);
-      routines.resources(args, options, function() {
-        options.dev = args[1] + ".bundle.js";
-        mForge.proprieties.change(process.cwd(), options, function() {
-          mForge.develop.start(sass, js, process.cwd() + "www/");
-        });
-      });
+      async.waterfall(asyncFuncs);
     });
   },
   webserver: function(args, options) {
@@ -153,68 +105,62 @@ var routines = {
     });
   },
   mobile: function(args, options) {
-    mForge.webserver.utils.loadConfig(process.cwd(), options.env,
-      function(config) {
-        var url = config + options.app + ".json";
-        mForge.webserver.utils.requestApp(url, options.app, "mobile", options.env,
-        function(appDef) {
-          var asyncFuncs = [];
-          options.analytics = appDef.appAnalytics;
-          options.facebookAppId = appDef.facebookAppId || "FACEBOOKID";
-          options.facebookAppName = appDef.facebookAppName || "FACEBOOKIDNAME";
-          // -------------------------------------------------------
-          // SUPPORT FUNCTIONS
-          // -------------------------------------------------------
-          var dw = function(moblet) {
-            // console.log(moblet);
-            return function(callback) {
-              download(moblet, js.destination + fileName(moblet), function() {
-                awesome
-                .success("🎉 downloaded moblet " + fileName(moblet) + " 🎉");
-                callback();
-              });
-            };
-          };
-          var dwi = function(image) {
-            // console.log(moblet);
-            return function(callback) {
-              downloadImage(image, function() {
-                console.log(image, 'downloaded');
-                callback();
-              });
-            };
-          };
-          var prepare = function(mobletsList) {
-            var ml = [];
-            for (var i = 0; i < mobletsList.length; i++) {
-              ml.push(fileName(mobletsList[i]));
-            }
-            options.moblets = ml;
-            return function(callback) {
-              mForge.proprieties.change(process.cwd(), options, callback);
-            };
-          };
-          // -------------------------------------------------------
-          // END OF SUPPORT FUNCTIONS
-          // -------------------------------------------------------
-
-          asyncFuncs.push(prepare(appDef.moblets));
-
-          for (var i = 0; i < appDef.moblets.length; i++) {
-            asyncFuncs.push(dw(appDef.moblets[i]));
-          }
-          if (appDef.pushImage) {
-            asyncFuncs.push(dwi(appDef.pushImage));
-          } else {
-            console.log("no push icon");
-          }
-
-          async.waterfall(asyncFuncs);
+    // subs options
+    options.target = 'mobile';
+    // subs options
+    mForge.utils.appDef(process.cwd(), options, function(config) {
+      options = merge(options, config);
+      var asyncFuncs = [];
+      // add moblet injection to functions array
+      asyncFuncs.push(function(callback) {
+        var ml = [];
+        for (var i = 0; i < config.moblets.length; i++) {
+          ml.push(mForge.utils.fileName(config.moblets[i]));
+        }
+        options.moblets = ml;
+        mForge.proprieties.change(process.cwd(), options, callback);
+      });
+      // add download push icon to functions array
+      if (config.pushImage) {
+        asyncFuncs.push(mForge.utils.images.download(process.cwd(), config.pushImage));
+      } else {
+        console.log("no push icon");
+      }
+      // add download moblets to functions array
+      if (config.moblets.length > 0) {
+        for (var i = 0; i < config.moblets.length; i++) {
+          asyncFuncs.push(mForge.utils.moblets.download(process.cwd(), config.moblets[i]));
+        }
+      } else {
+        console.log("no new moblets");
+      }
+      awesome.row();
+      awesome.info("executing now " + asyncFuncs.length + " async functions");
+      awesome.row();
+      asyncFuncs.push(function() {
+        awesome.success("✅  waterfall async functions done");
+      });
+      async.waterfall(asyncFuncs);
+    });
+  },
+  moblet: function(args, options) {
+    // TODO: ARRUAR ESSA TRETA
+    js.path.push(args[2] + "/moblet/**/*");
+    js.location.push(args[2] + "/moblet/" + args[1] + ".js");
+    // excs action
+    mForge.utils.appDef(process.cwd(), options, function(config) {
+      // options.analytics = config.google_analytics_id_web;
+      // options.facebookId = config.info.facebook_app_id || "MOCKDATATESDSD";
+      options = merge(options, config);
+      routines.resources(args, options, function() {
+        options.dev = args[1] + ".bundle.js";
+        mForge.proprieties.change(process.cwd(), options, function() {
+          mForge.develop.start(sass, js, process.cwd() + "www/");
         });
       });
+    });
   }
 };
-
 cli.main(function(args, options) {
   var action = args[0];
   if (options.version) {
@@ -225,7 +171,7 @@ cli.main(function(args, options) {
     awesome.row();
     awesome.info("starting " + action + " build");
     awesome.row();
-    options.id = options.app;
+    options.id = options.appId;
     routines[args[0]](args, options);
   }
 });
