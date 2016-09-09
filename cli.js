@@ -117,6 +117,15 @@ var routines = {
         options.moblets = ml;
         mForge.proprieties.change(process.cwd(), options, callback);
       });
+
+      // add replace facebook to functions array
+      asyncFuncs.push(function(callback) {
+        mForge.utils.replaceFacebookAndroid(process.cwd(), options, callback);
+      });
+      asyncFuncs.push(function(callback) {
+        mForge.utils.replaceFacebookIOS(process.cwd(), options, callback);
+      });
+
       // add download push icon to functions array
       if (config.pushImage) {
         asyncFuncs.push(mForge.utils.images.download(process.cwd(), config.pushImage));
@@ -161,7 +170,7 @@ cli.main(function(args, options) {
   var action = args[0];
   if (options.version) {
     awesome.row();
-    awesome.info("version: v2-beta");
+    awesome.info("v1.8.1");
     awesome.row();
   } else {
     awesome.row();

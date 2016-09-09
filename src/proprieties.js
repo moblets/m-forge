@@ -149,8 +149,8 @@ var _proprieties = {
     awesome.row();
     // get config
     var configPath = project + "/env." + options.env + ".json";
-    proprieties.loadConfig(configPath, function(data) {
-      var configFile = JSON.parse(data);
+    utils.loadJson(configPath, function(data) {
+      var configFile = data;
       var targetAppFile = project + '/www/app.js';
       var targetIndexFile = (options.rev) ? project + '/www/index-rev.html' : project + '/www/index.html';
 

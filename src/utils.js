@@ -4,6 +4,8 @@ var request = require('request');
 var uniq = require('lodash.uniq');
 var https = require('https');
 var http = require('http');
+var replace = require('gulp-replace');
+var gulp = require('gulp');
 
 var utils = {
   destination: function(file) {
@@ -25,13 +27,62 @@ var utils = {
       });
     });
   },
-  config: function(location, options, callback) {
-    var config = location + "/env." + options.env + ".json";
-    require('fs').readFile(config, 'utf8', function(err, data) {
+  loadJson: function(configUrl, callback) {
+    require('fs').readFile(configUrl, 'utf8', function(err, data) {
       if (err) {
         awesome.error(err);
       } else {
         callback(JSON.parse(data));
+      }
+    });
+  },
+  config: function(location, options, callback) {
+    var config = location + "/env." + options.env + ".json";
+    utils.loadJson(config, function(data) {
+      callback(data);
+    });
+  },
+  replaceFacebookIOS: function(location, options, callback) {
+    var FACEBOOKIDREGEX = /("FacebookAppID":[^,]*,)/ig;
+    var FACEBOOKNAMEREGEX = /("FacebookDisplayName":[^,]*,)/ig;
+    var FACEBOOKURLREGEX = /(>CFBundleURLSchemes<\/key><array><string>fb[^,]*,)/ig;
+    var plataformIosDir = location + "/platforms/ios/";
+    var idToReplace = "\"FacebookAppID\": [ \n\t\t\t\t\t\t\t{\t\t\t\t\t\t\t\t\"xml\": \"<string>" +
+                        options.facebookAppId + "</string>\",";
+    var nameToReplace = "\"FacebookDisplayName\": [ \n\t\t\t\t\t\t\t{\t\t\t\t\t\t\t\t\"xml\": \"<string>" +
+                        options.appName + "</string>\",";
+    var urlToReplace = ">CFBundleURLSchemes</key><array><string>fb" + options.facebookAppId +
+                        "</string></array></dict></array>\",";
+    awesome.success("🔄  replace in ios ");
+    awesome.success("🔄  replace Facebook App Id to: " + options.facebookAppId);
+    awesome.success("🔄  replace Facebook App Name to: " + options.appName);
+    fs.exists(plataformIosDir, function(exists) {
+      if (exists) {
+        gulp.src(plataformIosDir + "/ios.json")
+          .pipe(replace(FACEBOOKIDREGEX, idToReplace))
+          .pipe(replace(FACEBOOKNAMEREGEX, nameToReplace))
+          .pipe(replace(FACEBOOKURLREGEX, urlToReplace))
+          .pipe(gulp.dest(plataformIosDir))
+          .on("end", callback);
+      }
+    });
+  },
+  replaceFacebookAndroid: function(location, options, callback) {
+    var FACEBOOKIDREGEX = /(<string name=\\"fb_app_id\\">.[^<]*<\/string>)/ig;
+    var FACEBOOKNAMEREGEX = /(<string name=\\"fb_app_name\\">.[^<]*<\/string>)/ig;
+    var plataformAndroidDir = location + "/platforms/android/";
+    var idToReplace = "<string name=\\\"fb_app_id\\\">" + options.facebookAppId + "</string>";
+    var nameToReplace = "<string name=\\\"fb_app_name\\\">" + options.appName + "</string>";
+    awesome.success("🔄  replace in android ");
+    awesome.success("🔄  replace Facebook App Id to: " + options.facebookAppId);
+    awesome.success("🔄  replace Facebook App Name to: " + options.appName);
+    fs.exists(plataformAndroidDir, function(exists) {
+      if (exists) {
+        gulp.src(plataformAndroidDir + "/android.json")
+          .pipe(replace(FACEBOOKIDREGEX, idToReplace))
+          .pipe(replace(FACEBOOKNAMEREGEX, nameToReplace))
+          .pipe(gulp.dest(plataformAndroidDir))
+          .on("end", callback);
       }
     });
   },
@@ -66,14 +117,27 @@ var utils = {
               moblets: newMoblets || null,
               pushImage: info.push_image || info.icon || null,
               appAnalytics: analyticsKey,
-              facebookAppId: info.facebookId,
-              facebookAppName: info.facebookName,
+              facebookAppId: info.facebookId || "336873263368499",
               appId: info.id || null,
               appName: info.name || null,
               icon: info.icon || null,
               splash: info.splash || null,
               color: style.app[0] || null
             };
+            awesome.row();
+            awesome.info("loaded configs:");
+            awesome.row();
+            for (var item in object) {
+              if (typeof object[item] === "object") {
+                console.log("‣ " + item + " : ");
+                for (var itemO in object[item]) {
+                  console.log("     -" + object[item][itemO]);
+                }
+              } else {
+                console.log("‣ " + item + " : " + object[item]);
+              }
+            }
+            awesome.row();
             callback(object);
           }
         } catch (e) {
