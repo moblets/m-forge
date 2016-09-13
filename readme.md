@@ -3,7 +3,7 @@ mForge is a package and cli for broserify, minify and revision moblets packs to
 use with base-ionic-project of moblets
 
 ### Version
-1.8.1
+1.8.2
 
 
 ## OPTIONS
@@ -59,6 +59,9 @@ $ m-forge webserver [-e <environment>]
 - integrate with moblet scaffold
 
 ## CHANGELOG
+
+<v.1.8.2>
+ - allow images URLs to be HTTP or HTTPS
 
 <v.1.8.1>
  - add change facebook id and name in jsons for platforms

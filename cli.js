@@ -170,7 +170,7 @@ cli.main(function(args, options) {
   var action = args[0];
   if (options.version) {
     awesome.row();
-    awesome.info("v1.8.1");
+    awesome.info("v1.8.2");
     awesome.row();
   } else {
     awesome.row();

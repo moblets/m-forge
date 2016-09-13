@@ -2,12 +2,13 @@ var fs = require('fs');
 var awesome = require('awesome-logs');
 var request = require('request');
 var uniq = require('lodash.uniq');
-var https = require('https');
-var http = require('http');
 var replace = require('gulp-replace');
 var gulp = require('gulp');
 
 var utils = {
+  httpOrHttps: function(url) {
+    return url.match(/^(http:\/\/)/) ? require('http') : require('https');
+  },
   destination: function(file) {
     var pathSplit = file.split("/");
     var fileName = pathSplit[pathSplit.length - 1];
@@ -19,7 +20,9 @@ var utils = {
   },
   download: function(url, dest, cb) {
     var file = fs.createWriteStream(dest);
-    https.get(url, function(response) {
+
+    var httpOrHttps = utils.httpOrHttps(url);
+    httpOrHttps.get(url, function(response) {
       response.pipe(file);
       file.on('finish', function() {
         awesome.success("⏬  downloaded file : " + utils.fileName(url));
@@ -162,7 +165,8 @@ var utils = {
         fs.exists(plataformAndroidDir, function(exists) {
           if (exists) {
             var file = fs.createWriteStream(pushImageDest[0]);
-            http.get(url, function(response) {
+            var httpOrHttps = utils.httpOrHttps(url);
+            httpOrHttps.get(url, function(response) {
               response.pipe(file);
               file.on('finish', function() {
                 file.close(
