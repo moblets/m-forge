@@ -97,7 +97,9 @@ var utils = {
       } else {
         url = config.API_URL + options.appId + ".json";
       }
-
+      awesome.row();
+      awesome.info("requesting app from:" + url);
+      awesome.row();
       request(url, function(error, response, body) {
         try {
           var bodyJson = JSON.parse(body);
