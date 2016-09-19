@@ -16,9 +16,7 @@ var requestAppAndRender = function(location, options, res, name, app) {
     options.fromName = true;
     options.name = name;
   }
-  awesome.row();
-  awesome.info("requesting app from:" + location);
-  awesome.row();
+
   utils.appDef(location, options, function(appDef) {
     console.log(appDef.appName);
     if (options.rev) {
