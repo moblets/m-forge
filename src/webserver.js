@@ -47,7 +47,7 @@ var webserver = function(location, options) {
   // app.use('/moblets', express.static(location + "/www/moblets/"));
   // app.use('/engine', express.static(location + "/www/engine/"));
   // app.use('/views', express.static(location + "/www/views/"));
-  // app.use('/css', express.static(location + "/www/css/"));
+  app.use('/favicon.ico', express.static(location + "/www/favicon.ico"));
     // ROUTES
 
   app.get('/:appName', function(req, res) {
