@@ -51,14 +51,14 @@ var webserver = function(location, options) {
     // ROUTES
 
   app.get('/:appName', function(req, res) {
-    if (typeof req.params.appName !== "undefined" || req.params.appName !== "0") {
+    if (typeof req.params.appName !== "undefined" || req.params.appName !== "0" || req.params.appName !== "favicon.ico") {
       awesome.row();
       awesome.info("req app by appname: " + req.params.appName);
       requestAppAndRender(location, options, res, req.params.appName);
     }
   });
   app.get('/id/:appId', function(req, res) {
-    if (typeof req.params.appId !== "undefined" || req.params.appId !== "0") {
+    if (typeof req.params.appId !== "undefined" || req.params.appId !== "0" || req.params.appName !== "favicon.ico") {
       awesome.row();
       awesome.info("req app by id: " + req.params.appId);
       requestAppAndRender(location, options, res, undefined, req.params.appId);
