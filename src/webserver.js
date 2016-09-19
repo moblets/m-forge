@@ -12,13 +12,13 @@ var utils = require('./utils.js');
 var requestAppAndRender = function(location, options, res, name, app) {
   if (typeof name === "undefined") {
     options.appId = app;
+    options.fromName = false;
   } else {
     options.fromName = true;
     options.name = name;
   }
 
   utils.appDef(location, options, function(appDef) {
-    console.log(appDef.appName);
     if (options.rev) {
       res.render('index-rev', appDef);
     } else {

@@ -60,6 +60,9 @@ $ m-forge webserver [-e <environment>]
 
 ## CHANGELOG
 
+<v.1.8.8>
+ - fix download from app name
+
 <v.1.8.2>
  - allow images URLs to be HTTP or HTTPS
 
