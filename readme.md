@@ -60,6 +60,10 @@ $ m-forge webserver [-e <environment>]
 
 ## CHANGELOG
 
+
+<v.1.8.81>
+ - deletes facebookconnect from android res and create a new one.
+
 <v.1.8.8>
  - fix download from app name
 

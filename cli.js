@@ -122,6 +122,7 @@ var routines = {
       asyncFuncs.push(function(callback) {
         mForge.utils.replaceFacebookAndroid(process.cwd(), options, callback);
       });
+
       asyncFuncs.push(function(callback) {
         mForge.utils.replaceFacebookIOS(process.cwd(), options, callback);
       });
