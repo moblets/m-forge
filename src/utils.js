@@ -122,7 +122,7 @@ var utils = {
               moblets: newMoblets || null,
               pushImage: info.push_image || info.icon || null,
               appAnalytics: analyticsKey,
-              facebookAppId: info.facebookId || "336873263368499",
+              facebookAppId: info.fb_access_key,
               appId: info.id || null,
               appName: info.name || null,
               icon: info.icon || null,
