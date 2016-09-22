@@ -63,7 +63,7 @@ var proprieties = {
       .pipe(gulp.dest(dest))
       .on("end", callback);
     },
-    identifies: function(file, projectPath, data, target, callback) {
+    identifies: function(file, data, target, callback) {
       var dest = utils.destination(file);
       gulp.src(file)
       .pipe(replace(RGX_APPID, proprieties.createConstant('APP_ID', data.APP_ID, target)))
@@ -71,18 +71,7 @@ var proprieties = {
       .pipe(replace(RGX_FACEBOOKAPI, proprieties.createConstant('FACEBOOK_APP_ID', data.FACEBOOK_APP_ID, target)))
       .pipe(gulp.dest(dest))
       .on("end", function() {
-        try {
-          var to = projectPath + '/platforms/android/res/values/facebookconnect.xml';
-          fs.copy(projectPath + '/facebookconnect.xml', to, {replace: true}, function(err) {
-            if (err) {
-              throw err;
-            } else {
-              callback();
-            }
-          });
-        } catch (e) {
-
-        }
+        callback();
       });
     },
     tags: function(target, file, dev, moblets, callback) {
@@ -176,7 +165,7 @@ var _proprieties = {
       proprieties.change.srcs(options.target, targetIndexFile, function() {
         proprieties.change.tags(options.target, targetIndexFile, options.dev, options.moblets, function() {
           proprieties.change.envs(targetAppFile, configFile, function() {
-            proprieties.change.identifies(targetAppFile, project, identifies, options.target, function() {
+            proprieties.change.identifies(targetAppFile, identifies, options.target, function() {
               if (typeof callback === "function") {
                 callback();
               }

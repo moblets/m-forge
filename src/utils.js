@@ -85,7 +85,16 @@ var utils = {
           .pipe(replace(FACEBOOKIDREGEX, idToReplace))
           .pipe(replace(FACEBOOKNAMEREGEX, nameToReplace))
           .pipe(gulp.dest(plataformAndroidDir))
-          .on("end", callback);
+          .on("end", function() {
+            var to = location + '/platforms/android/res/values/facebookconnect.xml';
+            fs.copy(location + '/facebookconnect.xml', to, {replace: true}, function(err) {
+              if (err) {
+                throw err;
+              } else {
+                callback();
+              }
+            });
+          });
       }
     });
   },
