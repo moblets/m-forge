@@ -71,14 +71,18 @@ var proprieties = {
       .pipe(replace(RGX_FACEBOOKAPI, proprieties.createConstant('FACEBOOK_APP_ID', data.FACEBOOK_APP_ID, target)))
       .pipe(gulp.dest(dest))
       .on("end", function() {
-        var to = projectPath + '/platforms/android/res/values/facebookconnect.xml';
-        fs.copy(projectPath + '/facebookconnect.xml', to, {replace: true}, function(err) {
-          if (err) {
-            throw err;
-          } else {
-            callback();
-          }
-        });
+        try {
+          var to = projectPath + '/platforms/android/res/values/facebookconnect.xml';
+          fs.copy(projectPath + '/facebookconnect.xml', to, {replace: true}, function(err) {
+            if (err) {
+              throw err;
+            } else {
+              callback();
+            }
+          });
+        } catch (e) {
+
+        }
       });
     },
     tags: function(target, file, dev, moblets, callback) {
