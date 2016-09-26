@@ -4,6 +4,7 @@ var request = require('request');
 var uniq = require('lodash.uniq');
 var replace = require('gulp-replace');
 var gulp = require('gulp');
+var fs = require('fs.extra');
 
 var utils = {
   httpOrHttps: function(url) {

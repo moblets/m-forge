@@ -9,7 +9,6 @@ var path = require('path');
 var gulp = require('gulp');
 var prettify = require('gulp-html-prettify');
 var replace = require('gulp-replace');
-var fs = require('fs.extra');
 var utils = require('./utils.js');
 
 var RGX_APPID = /(.constant\('APP_ID',.[^\)]*\))/i;
