@@ -129,14 +129,18 @@ var routines = {
 
       // add download push icon to functions array
       if (config.pushImage) {
-        asyncFuncs.push(mForge.utils.images.download(process.cwd(), config.pushImage));
+        asyncFuncs.push(function(callback) {
+          mForge.utils.images.download(process.cwd(), config.pushImage, callback);
+        });
       } else {
         console.log("no push icon");
       }
       // add download moblets to functions array
       if (config.moblets.length > 0) {
         for (var i = 0; i < config.moblets.length; i++) {
-          asyncFuncs.push(mForge.utils.moblets.download(process.cwd(), config.moblets[i]));
+          asyncFuncs.push(function(callback) {
+            mForge.utils.moblets.download(process.cwd(), config.moblets[i], callback);
+          });
         }
       } else {
         console.log("no new moblets");
@@ -171,7 +175,7 @@ cli.main(function(args, options) {
   var action = args[0];
   if (options.version) {
     awesome.row();
-    awesome.info("v1.8.86");
+    awesome.info("v1.8.87");
     awesome.row();
   } else {
     awesome.row();

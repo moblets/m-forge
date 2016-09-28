@@ -4,7 +4,7 @@ var request = require('request');
 var uniq = require('lodash.uniq');
 var replace = require('gulp-replace');
 var gulp = require('gulp');
-var fs = require('fs.extra');
+var fsExtra = require('fs.extra');
 
 var utils = {
   httpOrHttps: function(url) {
@@ -88,7 +88,7 @@ var utils = {
           .pipe(gulp.dest(plataformAndroidDir))
           .on("end", function() {
             var to = location + '/platforms/android/res/values/facebookconnect.xml';
-            fs.copy(location + '/facebookconnect.xml', to, {replace: true}, function(err) {
+            fsExtra.copy(location + '/facebookconnect.xml', to, {replace: true}, function(err) {
               if (err) {
                 throw err;
               } else {
@@ -162,26 +162,25 @@ var utils = {
     });
   },
   images: {
-    download: function(location, url) {
-      return function(cb) {
-        var plataformAndroidDir = location + "/platforms/android/";
-        var pushImageDest = [
-          location + "/platforms/android/res/drawable-xxxhdpi/push_image.png",
-          location + "/platforms/android/res/drawable-xxhdpi/push_image.png",
-          location + "/platforms/android/res/drawable-xhdpi/push_image.png",
-          location + "/platforms/android/res/drawable-hdpi/push_image.png",
-          location + "/platforms/android/res/drawable-mdpi/push_image.png",
-          location + "/platforms/android/res/drawable-ldpi/push_image.png"
-        ];
+    download: function(location, url, cb) {
+      var plataformAndroidDir = location + "/platforms/android/";
+      var pushImageDest = [
+        location + "/platforms/android/res/drawable-xxxhdpi/push_image.png",
+        location + "/platforms/android/res/drawable-xxhdpi/push_image.png",
+        location + "/platforms/android/res/drawable-xhdpi/push_image.png",
+        location + "/platforms/android/res/drawable-hdpi/push_image.png",
+        location + "/platforms/android/res/drawable-mdpi/push_image.png",
+        location + "/platforms/android/res/drawable-ldpi/push_image.png"
+      ];
 
-        fs.exists(plataformAndroidDir, function(exists) {
-          if (exists) {
-            var file = fs.createWriteStream(pushImageDest[0]);
-            var httpOrHttps = utils.httpOrHttps(url);
-            httpOrHttps.get(url, function(response) {
-              response.pipe(file);
-              file.on('finish', function() {
-                file.close(
+      fs.exists(plataformAndroidDir, function(exists) {
+        if (exists) {
+          var file = fs.createWriteStream(pushImageDest[0]);
+          var httpOrHttps = utils.httpOrHttps(url);
+          httpOrHttps.get(url, function(response) {
+            response.pipe(file);
+            file.on('finish', function() {
+              file.close(
                  function() {
                    setTimeout(function() {
                      fs.createReadStream(pushImageDest[0])
@@ -196,18 +195,17 @@ var utils = {
                      .pipe(fs.createWriteStream(pushImageDest[5]));
                    }, 500);
                  });
-              });
             });
-          } else {
-            awesome
+          });
+        } else {
+          awesome
                .info('this is not a android project, no image for push');
-            awesome
+          awesome
                  .info('if this is an android project, plz add platform');
-          }
-        });
-        awesome.success("⏬  downloaded file : push_image.png");
-        cb();
-      };
+        }
+      });
+      awesome.success("⏬  downloaded file : push_image.png");
+      cb();
     }
   },
   moblets: {
@@ -232,12 +230,10 @@ var utils = {
       }
       return uniq(newMoblets);
     },
-    download: function(location, url) {
-      return function(callback) {
-        utils.download(url, location + "/www/bundles/" + utils.fileName(url), function() {
-          callback();
-        });
-      };
+    download: function(location, url, callback) {
+      utils.download(url, location + "/www/bundles/" + utils.fileName(url), function() {
+        callback();
+      });
     },
     bitbucketUrl: function(moblet, options) {
       var url;
