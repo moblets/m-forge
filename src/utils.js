@@ -68,6 +68,8 @@ var utils = {
           .pipe(replace(FACEBOOKURLREGEX, urlToReplace))
           .pipe(gulp.dest(plataformIosDir))
           .on("end", callback);
+      } else {
+        callback();
       }
     });
   },
@@ -96,6 +98,8 @@ var utils = {
               }
             });
           });
+      } else {
+        callback();
       }
     });
   },

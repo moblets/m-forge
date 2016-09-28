@@ -175,7 +175,7 @@ cli.main(function(args, options) {
   var action = args[0];
   if (options.version) {
     awesome.row();
-    awesome.info("v1.8.87");
+    awesome.info("v1.8.89");
     awesome.row();
   } else {
     awesome.row();
