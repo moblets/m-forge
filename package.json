@@ -1,6 +1,6 @@
 {
   "name": "m-forge",
-  "version": "1.8.9",
+  "version": "1.8.91",
   "description": "cli and function for forge moblets ",
   "main": "m-forge.js",
   "scripts": {

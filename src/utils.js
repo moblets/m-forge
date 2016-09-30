@@ -138,7 +138,7 @@ var utils = {
               appAnalytics: analyticsKey,
               facebookAppId: info.fb_access_key || null,
               appId: info.id || null,
-              appName: info.name || null,
+              appName: info.name.replace(/([-])/g, "-").replace(/(['])/g, "-") || null,
               icon: info.icon || null,
               splash: info.splash || null,
               color: style.app[0] || null

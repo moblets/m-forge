@@ -74,8 +74,14 @@ var routines = {
       });
       // add download moblets to functions array
       if (config.moblets.length > 0) {
+        var mobletDownloadFunction = function(location) {
+          return function(callback) {
+            mForge.utils.moblets.download(process.cwd(), location, callback);
+          };
+        };
+
         for (var i = 0; i < config.moblets.length; i++) {
-          asyncFuncs.push(mForge.utils.moblets.download(process.cwd(), config.moblets[i]));
+          asyncFuncs.push(mobletDownloadFunction(config.moblets[i]));
         }
       } else {
         console.log("no new moblets");
@@ -179,7 +185,7 @@ cli.main(function(args, options) {
   var action = args[0];
   if (options.version) {
     awesome.row();
-    awesome.info("v1.8.9");
+    awesome.info("v1.8.91");
     awesome.row();
   } else {
     awesome.row();
