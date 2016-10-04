@@ -1,6 +1,6 @@
 {
   "name": "m-forge",
-  "version": "1.8.91",
+  "version": "1.9.0",
   "description": "cli and function for forge moblets ",
   "main": "m-forge.js",
   "scripts": {
@@ -46,7 +46,6 @@
     "gulp-replace": "^0.5.4",
     "gulp-rev": "^7.0.0",
     "gulp-rev-replace": "^0.4.3",
-    "gulp-sass": "^2.3.1",
     "gulp-strip-comments": "^2.4.3",
     "gulp-strip-debug": "^1.1.0",
     "gulp-tap": "^0.1.3",
@@ -61,7 +60,6 @@
     "parse-code-context": "^0.2.2",
     "q": "^1.4.1",
     "request": "^2.72.0",
-    "sassify": "^0.10.0",
     "tiny-lr": "^0.2.1",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",

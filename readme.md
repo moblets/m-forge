@@ -3,7 +3,7 @@ mForge is a package and cli for broserify, minify and revision moblets packs to
 use with base-ionic-project of moblets
 
 ### Version
-1.8.2
+1.9
 
 
 ## OPTIONS
@@ -60,6 +60,8 @@ $ m-forge webserver [-e <environment>]
 
 ## CHANGELOG
 
+<v.1.9>
+ - remove sass and add less support
 
 <v.1.8.81>
  - deletes facebookconnect from android res and create a new one.
