@@ -17,10 +17,11 @@ cli.parse({
   version: ['v', 'version', 'boolean', false],
   target: ['t', 'target', 'string', "web"]
 });
-var sass = {
-  path: [process.cwd() + '/m-base/**/*.scss',
-    process.cwd() + '/u-moblets/**/*.scss'],
-  location: process.cwd() + '/m-base/m-base.scss',
+
+var less = {
+  path: [process.cwd() + '/m-base/**/*.less',
+    process.cwd() + '/u-moblets/**/*.less'],
+  location: process.cwd() + '/m-base/m-base.less',
   destination: process.cwd() + "/www/css/"
 };
 
@@ -39,7 +40,7 @@ var destination = process.cwd() + "/www/bundles/";
 var manifest = process.cwd() + "/www/bundles/rev-manifest.json";
 var routines = {
   resources: function(args, options, callback) {
-    mForge.bundler.sass(sass.location, sass.destination, options.min)
+    mForge.bundler.less(less.location, less.destination, options.min)
       .on('end', function() {
         mForge.bundler.compile(js.location, destination,
           options.min, options.rev)
@@ -93,7 +94,7 @@ var routines = {
         awesome.success("✅  waterfall async functions done");
         awesome.success("🌐  now starting develop auto reload server");
         routines.resources(args, options, function() {
-          mForge.develop.start(sass, js, process.cwd() + "/www/");
+          mForge.develop.start(less, js, process.cwd() + "/www/");
         });
       });
       async.waterfall(asyncFuncs);
@@ -175,7 +176,7 @@ var routines = {
       routines.resources(args, options, function() {
         options.moblets.push(args[2] + "/moblet/" + args[1] + ".js");
         mForge.proprieties.change(process.cwd(), options, function() {
-          mForge.develop.start(sass, js, process.cwd() + "www/");
+          mForge.develop.start(less, js, process.cwd() + "www/");
         });
       });
     });

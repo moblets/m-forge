@@ -11,9 +11,9 @@ var bundler = require('./bundler.js');
 
 var develop = {
   watch: {
-    sass: function(path, location, destination) {
+    less: function(path, location, destination) {
       gulp.watch(path, function(event) {
-        return bundler.sass(location, destination, false)
+        return bundler.less(location, destination, false)
               .on('end', function() {
                 browserSync.reload(event);
               });
@@ -48,8 +48,8 @@ var develop = {
   livereload: function() {
     tinylr.listen(35729);
   },
-  start: function(sass, js, location) {
-    develop.watch.sass(sass.path, sass.location, sass.destination);
+  start: function(less, js, location) {
+    develop.watch.less(less.path, less.location, less.destination);
     develop.watch.javascript(js.path, js.location, js.destination);
     develop.server(location);
   }

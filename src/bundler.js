@@ -7,9 +7,9 @@ var gulp = require('gulp');
 var browserify = require('browserify');
 var brfs = require('brfs');
 var rename = require('gulp-rename');
-var sass = require('gulp-sass');
+var less = require('gulp-less');
 var utils = require('./utils.js');
-var sassify = require('sassify');
+var lessify = require('lessify');
 var stripDebug = require('gulp-strip-debug');
 var strip = require('gulp-strip-comments');
 var revision = require('gulp-rev');
@@ -40,11 +40,7 @@ var bundler = {
       paths: ['/Users/leo/workspace/fabapp/m-forge/node_modules']
     })
       .transform(mobletfy)
-      .transform(sassify, {
-        'auto-inject': true, // Inject css directly in the code
-        'base64Encode': false, // Use base64 to inject css
-        'sourceMap': false // Add source map to the code
-      })
+      .transform(lessify)
       .transform(brfs, {})
       .add(location)
       .bundle()
@@ -102,19 +98,18 @@ var bundler = {
     });
     return deferred.promise;
   },
-  sass: function(location, destination) {
+  less: function(location, destination) {
     if (typeof location === "string") {
       location = [location];
     }
     awesome.row();
-    awesome.info("building sass for for: ");
+    awesome.info("building less for for: ");
     for (var i = 0; i < location.length; i++) {
-      awesome.info("✅  " + utils.fileName(location[i]).replace('js', 'scss'));
+      awesome.info("✅  " + utils.fileName(location[i]).replace('js', 'less'));
     }
-
+    var options = {};
     var stream = gulp.src(location)
-      .pipe(sass())
-      .on('error', sass.logError)
+      .pipe(less(options))
       .pipe(gulp.dest(destination));
     awesome.row();
     stream
