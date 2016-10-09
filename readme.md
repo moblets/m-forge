@@ -60,6 +60,9 @@ $ m-forge webserver [-e <environment>]
 
 ## CHANGELOG
 
+<v.1.9.1>
+ - change web template
+
 <v.1.9>
  - remove sass and add less support
 

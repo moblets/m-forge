@@ -7,14 +7,4 @@
 <link rel="icon" type="image/png" href="{{icon}}" />
 {{/icon}}
 <link rel="apple-touch-startup-image" href="{{splash}}">
-<script type="text/javascript">
-	document.addEventListener("DOMContentLoaded",function(){
-	  var elemDiv = document.createElement('div');
-	    elemDiv.id = "m-web-splash";
-	    elemDiv.style.cssText = "background-image:url({{{splash}}});";
-	    elemDiv.innerHTML = '';
-	     window.document.body
-             .insertBefore(elemDiv, window.document.body.firstChild);
-	} , false);
-</script>
 <title>{{appName}}</title>
