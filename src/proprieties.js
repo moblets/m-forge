@@ -76,6 +76,7 @@ var proprieties = {
     tags: function(target, file, dev, moblets, callback) {
       var dest = utils.destination(file);
       var templateD = (dev) ? '<script src="bundles/' + dev + '"></script>' : "";
+
       proprieties.loadTemplates(function(templates) {
         var replaces = {
           dev: templateD,
@@ -162,7 +163,7 @@ var _proprieties = {
         FACEBOOK_APP_ID: (options.target === 'web') ? "window.facebookAppId" : options.facebookAppId
       };
       proprieties.change.srcs(options.target, targetIndexFile, function() {
-        proprieties.change.tags(options.target, targetIndexFile, options.dev, options.moblets, function() {
+        proprieties.change.tags(options.target, targetIndexFile, options.devMoblet, options.moblets, function() {
           proprieties.change.envs(targetAppFile, configFile, function() {
             proprieties.change.identifies(targetAppFile, identifies, options.target, function() {
               if (typeof callback === "function") {

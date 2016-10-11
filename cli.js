@@ -166,17 +166,20 @@ var routines = {
     });
   },
   moblet: function(args, options) {
-    js.path.push(args[2] + "/moblet/**/*");
-    js.location.push(args[2] + "/moblet/" + args[1] + ".js");
+    console.log(args[2]);
+    js.path.push(args[2] + "moblet/**/*");
+    js.location.push(args[2] + "moblet/" + args[1] + ".js");
     // subs options
     options.target = 'mobile';
     // excs action
     mForge.utils.appDef(process.cwd(), options, function(config) {
       options = merge(options, config);
       routines.resources(args, options, function() {
-        options.moblets.push(args[2] + "/moblet/" + args[1] + ".js");
+        options.moblets = [];
+        options.devMoblet = [];
+        options.devMoblet.push(args[1] + ".bundle.js");
         mForge.proprieties.change(process.cwd(), options, function() {
-          mForge.develop.start(less, js, process.cwd() + "www/");
+          mForge.develop.start(less, js, process.cwd() + "/www/");
         });
       });
     });
@@ -186,7 +189,7 @@ cli.main(function(args, options) {
   var action = args[0];
   if (options.version) {
     awesome.row();
-    awesome.info("v1.9.1");
+    awesome.info("v1.9.2");
     awesome.row();
   } else {
     awesome.row();
