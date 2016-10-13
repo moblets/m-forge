@@ -61,6 +61,9 @@ $ m-forge webserver [-e <environment>]
 ## CHANGELOG
 
 <v.1.9.2>
+ - fix broserify resolve paths
+
+<v.1.9.2>
  - change moblet develop script
 
 <v.1.9.1>

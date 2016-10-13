@@ -18,6 +18,7 @@ var minifyCss = require('gulp-minify-css');
 var revReplace = require('gulp-rev-replace');
 var vinylSource = require('vinyl-source-stream');
 var awesome = require('awesome-logs');
+var path = require('path');
 var mobletfy = require("./moblet");
 var q = require('q');
 
@@ -37,7 +38,7 @@ var bundler = {
     var deferred = q.defer();
     var mobletName = bundler.bundleName(location);
     var stream = browserify({
-      paths: ['/Users/leo/workspace/fabapp/m-forge/node_modules']
+      paths: [path.join(__dirname, '../node_modules')]
     })
       .transform(mobletfy)
       .transform(lessify)
