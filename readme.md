@@ -60,7 +60,10 @@ $ m-forge webserver [-e <environment>]
 
 ## CHANGELOG
 
-<v.1.9.2>
+<v.1.9.4>
+ - set crypto-js to install in m-forge
+
+<v.1.9.3>
  - fix broserify resolve paths
 
 <v.1.9.2>
