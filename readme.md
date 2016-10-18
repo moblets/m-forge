@@ -60,6 +60,9 @@ $ m-forge webserver [-e <environment>]
 
 ## CHANGELOG
 
+<v.1.9.5>
+ - fix preview load
+ 
 <v.1.9.4>
  - set crypto-js to install in m-forge
 

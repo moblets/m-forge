@@ -111,9 +111,14 @@ var utils = {
       } else {
         url = config.API_URL + options.appId + ".json";
       }
+      if (options.preview) {
+        url += "?preview=true";
+      }
+
       awesome.row();
       awesome.info("requesting app from:" + url);
       awesome.row();
+      console.log(url);
       request(url, function(error, response, body) {
         try {
           var bodyJson = JSON.parse(body);
