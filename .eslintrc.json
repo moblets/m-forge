@@ -1,0 +1,11 @@
+{
+  "extends": "airbnb",
+  "rules": {
+    "class-methods-use-this":"off",
+    "no-underscore-dangle": "off"
+  },
+  "globals":{
+    "document":true,
+    "app":true
+  }
+}
