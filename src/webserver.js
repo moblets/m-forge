@@ -9,6 +9,24 @@ var awesome = require('awesome-logs');
 var app = express();
 var utils = require('./utils.js');
 
+var requestAppAndRenderTerms = function(location, options, res, name, app) {
+  if (typeof name === "undefined") {
+    options.appId = app;
+    options.fromName = false;
+  } else {
+    options.fromName = true;
+    options.name = name;
+  }
+
+  utils.appDef(location, options, function(appDef) {
+    if (options.rev) {
+      res.render('terms', appDef);
+    } else {
+      res.render('terms', appDef);
+    }
+  });
+};
+
 var requestAppAndRender = function(location, options, res, name, app) {
   if (typeof name === "undefined") {
     options.appId = app;
@@ -56,6 +74,21 @@ var webserver = function(location, options) {
       awesome.info("req app by appname: " + req.params.appName);
       options.preview = req.query.preview;
       requestAppAndRender(location, options, res, req.params.appName);
+    }
+  });
+  app.get('/:appName/terms', function(req, res) {
+    if (typeof req.params.appName !== "undefined" || req.params.appName !== "0" || req.params.appName !== "favicon.ico") {
+      awesome.row();
+      awesome.info("req app by appname: " + req.params.appName);
+      options.preview = req.query.preview;
+      requestAppAndRenderTerms(location, options, res, req.params.appName);
+    }
+  });
+  app.get('/id/:appId/terms', function(req, res) {
+    if (typeof req.params.appId !== "undefined" || req.params.appId !== "0" || req.params.appName !== "favicon.ico") {
+      awesome.info("req app by id: " + req.params.appId);
+      options.preview = req.query.preview;
+      requestAppAndRenderTerms(location, options, res, undefined, req.params.appId);
     }
   });
   app.get('/id/:appId', function(req, res) {
