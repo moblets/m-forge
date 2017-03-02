@@ -174,12 +174,16 @@ var utils = {
     download: function(location, url, cb) {
       var plataformAndroidDir = location + "/platforms/android/";
       var pushImageDest = [
-        location + "/platforms/android/res/drawable-xxxhdpi/push_image.png",
-        location + "/platforms/android/res/drawable-xxhdpi/push_image.png",
-        location + "/platforms/android/res/drawable-xhdpi/push_image.png",
-        location + "/platforms/android/res/drawable-hdpi/push_image.png",
-        location + "/platforms/android/res/drawable-mdpi/push_image.png",
-        location + "/platforms/android/res/drawable-ldpi/push_image.png"
+        location + "/platforms/android/res/drawable-port-xxxhdpi/push_image.png",
+        location + "/platforms/android/res/drawable-port-xxhdpi/push_image.png",
+        location + "/platforms/android/res/drawable-port-xhdpi/push_image.png",
+        location + "/platforms/android/res/drawable-port-hdpi/push_image.png",
+        location + "/platforms/android/res/drawable-port-mdpi/push_image.png",
+        location + "/platforms/android/res/drawable-port-ldpi/push_image.png",
+        location + "/platforms/android/res/drawable-land-xhdpi/push_image.png",
+        location + "/platforms/android/res/drawable-land-hdpi/push_image.png",
+        location + "/platforms/android/res/drawable-land-mdpi/push_image.png",
+        location + "/platforms/android/res/drawable-land-ldpi/push_image.png"
       ];
 
       fs.exists(plataformAndroidDir, function(exists) {
