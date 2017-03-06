@@ -27,6 +27,16 @@ var requestAppAndRenderTerms = function(location, options, res, name, app) {
   });
 };
 
+var requestAppAndRenderTawkto = function(location, options, res, name, key) {
+  if (typeof name === "undefined") {
+    options.appId = app;
+    options.fromName = false;
+  } else {
+    options.fromName = true;
+    options.name = name;
+  }
+  res.render('tawkto', {key: key});
+};
 var requestAppAndRender = function(location, options, res, name, app) {
   if (typeof name === "undefined") {
     options.appId = app;
@@ -89,6 +99,13 @@ var webserver = function(location, options) {
       awesome.info("req app by id: " + req.params.appId);
       options.preview = req.query.preview;
       requestAppAndRenderTerms(location, options, res, undefined, req.params.appId);
+    }
+  });
+  app.get('/id/:appId/tawkto/:key', function(req, res) {
+    if (typeof req.params.appId !== "undefined" || req.params.appId !== "0" || req.params.appName !== "favicon.ico") {
+      awesome.info("req app by id: " + req.params.appId);
+      options.preview = req.query.preview;
+      requestAppAndRenderTawkto(location, options, res, undefined, req.params.key);
     }
   });
   app.get('/id/:appId', function(req, res) {
