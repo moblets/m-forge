@@ -16,6 +16,7 @@ var RGX_APPANALYTICS = /(.constant\('APP_ANALYTICS',.[^\)]*\))/i;
 var RGX_FACEBOOKAPI = /(.constant\('FACEBOOK_APP_ID',.[^\)]*\))/i;
 var RGX_APPURL = /(.constant\('API_URL',.[^\)]*\))/i;
 var RGX_NAUVAURL = /(.constant\('NAUVA_URL',.[^\)]*\))/i;
+var RGX_DAIAURL = /(.constant\('DAIA_URL',.[^\)]*\))/i;
 
 var proprieties = {
   createConstant: function(constant, value, target) {
@@ -59,6 +60,7 @@ var proprieties = {
       gulp.src(file)
       .pipe(replace(RGX_APPURL, proprieties.createConstant('API_URL', data.API_URL)))
       .pipe(replace(RGX_NAUVAURL, proprieties.createConstant('NAUVA_URL', data.NAUVA_URL)))
+      .pipe(replace(RGX_DAIAURL, proprieties.createConstant('DAIA_URL', data.DAIA_URL)))
       .pipe(gulp.dest(dest))
       .on("end", callback);
     },
