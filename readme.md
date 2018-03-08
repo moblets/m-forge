@@ -52,6 +52,20 @@ Change configurations and runs a webserver for the preview.
 $ m-forge webserver [-e <environment>]
 ```
 
+### MOBLET
+
+Run develop with a local moblet
+
+```
+$ m-forge moblet <moblet-name> <local-moblet-path> [-e <environment>] [-a <appId>]
+```
+
+Example:
+```
+$ m-forge moblet  m-list ../moblets/m-list/ -e dev -a 777335
+```
+
+
 ## TODO
 
 - refactor the revision option
