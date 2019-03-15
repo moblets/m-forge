@@ -47,6 +47,18 @@ var requestAppAndRender = function(location, options, res, name, app) {
   }
 
   utils.appDef(location, options, function(appDef) {
+    var url = "";
+
+    if (appDef.is_v2 == '1') {
+      if (options.fromName) {
+        url = "https://app-preview.fabricadeaplicativos.com.br/" + options.name;
+      } else {
+        url = "https://app-preview.fabricadeaplicativos.com.br/id/" + options.appId;
+      }
+
+      return res.redirect(url);
+    }
+
     if (options.rev) {
       res.render('index-rev', appDef);
     } else {

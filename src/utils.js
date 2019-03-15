@@ -146,7 +146,8 @@ var utils = {
               appName: info.name.replace(/([-])/g, "-").replace(/(['])/g, "-") || null,
               icon: info.icon || null,
               splash: info.splash || null,
-              color: style.app[0] || null
+              color: style.app[0] || null,
+              is_v2: bodyJson.is_v2 || "0",
             };
             awesome.row();
             awesome.info("loaded configs:");
