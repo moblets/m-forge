@@ -26,7 +26,7 @@
     "browser-sync": "^2.12.5",
     "browserify": "^13.0.0",
     "browserify-transform-tools": "^1.6.0",
-    "cli": "^0.11.2",
+    "cli": "^1.0.1",
     "colors": "^1.1.2",
     "connect-livereload": "^0.5.4",
     "crypto": "0.0.3",
