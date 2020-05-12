@@ -51,9 +51,9 @@ var requestAppAndRender = function(location, options, res, name, app) {
 
     if (appDef.is_v2 == '1') {
       if (options.fromName) {
-        url = "https://app-preview.fabricadeaplicativos.com.br/" + options.name;
+        url = "https://pwa.fabricadeaplicativos.com.br/" + options.name;
       } else {
-        url = "https://app-preview.fabricadeaplicativos.com.br/id/" + options.appId;
+        url = "https://pwa.fabricadeaplicativos.com.br/id/" + options.appId;
       }
 
       return res.redirect(url);
